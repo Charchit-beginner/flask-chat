@@ -13,7 +13,7 @@ class RegistrationForm(FlaskForm):
 	confirm_password = PasswordField('Confirm Password',
 						validators=[DataRequired(), Length(min=8, max=60), EqualTo('password')])
 	# recaptcha = RecaptchaField('Please complete the verification below to register')
-	submit = SubmitField('Sign Up')
+	submit = SubmitField('Submit')
 
 	
 	def validate_username(self, username):
@@ -23,10 +23,10 @@ class RegistrationForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     # Validate required fields from user for sign in
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+    username = StringField('Username',
+                        validators=[DataRequired(), Length(min=8, max=20)])
     password = PasswordField('Password',
-                        validators=[DataRequired()])
+                        validators=[DataRequired(), Length(min=8, max=60)])
     # recaptcha = RecaptchaField('Please complete the verification below to sign in') # Used to prevent bots brute force sign ins
-    # remember = BooleanField("Remember Me")
-    submit = SubmitField('Login')
+    remember = BooleanField("Remember Me")
+    submit = SubmitField('Submit')

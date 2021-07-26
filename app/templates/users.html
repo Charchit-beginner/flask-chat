@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block style %}
+<style>
+    
+
+.search:hover {
+    cursor:pointer;
+}
+.user::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+
+}
+.user::-webkit-scrollbar-thumb {
+    background:rgb(197 197 197);
+    border-radius: 10px;
+}
+.user::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: transparent;
+  }
+.user::-webkit-scrollbar-thumb:active { 
+    background-color: rgb(171 166 166);
+}  
+
+</style>
+{% endblock %}
+{% block body %}
+<div class="w-25 mx-auto" style="min-width:270px">
+    
+        <div class="container card px-3 py-3">
+            {% include "flash.html" %}
+            <div class="row align-items-center">
+                <div class="col d-flex">
+                    <div class="d-flex">
+                        <img class="rounded-circle border pfp border-dark" height="50" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="50">
+                        </img>
+                    </div>
+                    <div class="ps-2">
+                        <span class="fw-bold">
+                            Charchit
+                        </span>
+                        <br>
+                            <span>
+                                Active
+                            </span>
+                        </br>
+                    </div>
+                </div>
+                <div class="col">
+                    <form action="/logout" method="post" >
+                    <button class="btn btn-dark btn-sm float-end" type="submit">
+                        logout
+                    </button>
+                    </form>
+                </div>
+            </div>
+            <hr>
+                <div class="input-group mb-3 align-items-center justify-content-around" >
+                    <p class="text-muted fw-bold mb-0 p-desc">Choose User To Chat</p>
+                    <input  class="form-control d-none rounded" id="my_inp" placeholder="Enter Name to Search" type="text">
+                    <i aria-hidden="true" class="fa fa-search search">
+                            </i>
+                        <button class="btn btn-dark d-none close">
+                            
+                            <i class="fas fa-window-close fa-1x">
+                            </i>
+                        </button>
+                    </input>
+                </div>
+                <div class="user" style="height:244px; overflow-y: auto ;overflow-x: hidden;" >
+                {% for item in range(4) %}
+
+                    
+                
+                <div class="align-items-center d-flex">
+                    <img class="rounded-circle border  border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" height="40" width="40">
+                    </img>
+                    <div class="ps-2" style="white-space: nowrap;">
+                        <span class="fw-bold">
+                            Chirag
+                        </span>
+                        <br>
+                            <span>
+                                How are you? I am fine 
+                            </span>
+                        </br>
+                    </div>
+                </div>
+                <hr style="margin: 6px 0px;">
+                {% endfor %}
+                </div>
+        </div>
+    
+</div>
+<script type="text/javascript">
+    $(".search").click(function(){
+       $(this).hide() 
+
+       $("#my_inp").removeClass("d-none")
+       $("#my_inp").focus()
+       $(".p-desc").addClass("d-none")
+       $(".close").removeClass("d-none")
+    })
+    $(".close").click(function(){
+        $(this).addClass("d-none") 
+        $(".search").show()
+        $(".p-desc").removeClass("d-none")
+        $("#my_inp").addClass("d-none")
+    })
+
+</script>
+{% endblock %}
