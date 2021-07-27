@@ -25,16 +25,24 @@
     max-width: 300px;
     word-wrap: break-word;
 }
-@media only screen and (max-width: 600px){
+.card{
+  border-radius: 15px;
+  height:500px;
 
+}
+
+@media only screen and (max-width: 575px){
+.input-group{
+  margin-bottom: 0px!important;
+}
 }
     </style>
     {% endblock %}
     {% block body %}
             <div class="w-25 mx-auto main-div" style="min-width:300px;">
-        <div class="container card px-0 pb-3 pt-2" style="border-radius: 15px">
+        <div class="container card px-0 pb-3 pt-2" >
           {% include "flash.html" %}
-          <div class="d-flex mb-2">
+          <div class="d-flex mb-2 ">
                     <div class="d-flex align-items-center ms-3">
                       <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
                         <img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=35 height=35>
@@ -51,7 +59,7 @@
                         </br>
                     </div>
                 </div>
-    <div id="container"  style="overflow-y: auto; height:350px; background: #f8f8f8">
+    <div id="container" style="overflow-y: auto; height:100%; background: #f8f8f8">
     </div>
     
 <div class="input-group mb-3">
@@ -59,7 +67,8 @@
   <button class="btn btn-dark" type="submit" id="send"><i class="fab fa-telegram-plane"></i></button>
 </div>
 
-</div></div>
+</div>
+</div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -68,29 +77,6 @@
     <script src="{{url_for('static',filename='app.js')}}"></script>
 
    <script type="text/javascript">
-    function myFunction(x) {
-    if (x.matches) { // If media query matches
-      console.log("h")
-      $(".main-div").attr("class","container main-div px-0")
-      $(".card").css({"border-radius":"0px"})
-      $(".card").attr("class","container card px-0 pt-2")
-      $("body").attr("class","d-flex")
-      $("#container").height(window.innerHeight - 106)
-      $(".input-group").removeClass("mb-3")
-    } else {
-       $(".main-div").attr("class","w-25 mx-auto main-div")
-      $("body").attr("class","d-flex min-vh-100 justify-content-center align-items-center")
-      $(".card").css({"border-radius":"15px"})
-      $(".card").addClass("pb-3")
-      $("#container").height(350)
-      $(".input-group").addClass("mb-3")
-    } 
-  }
-
-    var x = window.matchMedia("(max-width: 600px)")
-    myFunction(x) 
-    x.addListener(myFunction) 
-
      function write(msg, pos,direct ) {
     var msg1 = document.createElement("div")
 

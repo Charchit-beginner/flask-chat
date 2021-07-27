@@ -27,10 +27,11 @@
 </style>
 {% endblock %}
 {% block body %}
-<div class="w-25 mx-auto" style="min-width:270px">
+<div class="w-25 mx-auto main-div" style="min-width:270px">
     
         <div class="container card px-3 py-3">
             {% include "flash.html" %}
+            <div class="px-3 py-3 h-100">
             <div class="row align-items-center">
                 <div class="col d-flex">
                     <div class="d-flex">
@@ -70,7 +71,7 @@
                     </input>
                 </div>
                 <div class="user" style="height:244px; overflow-y: auto ;overflow-x: hidden;" >
-                {% for item in range(4) %}
+                {% for item in range(10) %}
 
                     
                 
@@ -91,6 +92,7 @@
                 <hr style="margin: 6px 0px;">
                 {% endfor %}
                 </div>
+            </div>
         </div>
     
 </div>
