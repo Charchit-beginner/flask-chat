@@ -1,0 +1,23 @@
+.user {
+    height: 244px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.search:hover {
+    cursor: pointer;
+}
+.user::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+}
+.user::-webkit-scrollbar-thumb {
+    background: rgb(197 197 197);
+    border-radius: 10px;
+}
+.user::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: transparent;
+}
+.user::-webkit-scrollbar-thumb:active {
+    background-color: rgb(171 166 166);
+}

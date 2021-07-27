@@ -1,48 +1,57 @@
 {% extends "layout.html" %}
 {% block body %}
-
-        <div class="w-25 mx-auto main-div" style="min-width:270px ">
-        <div class="container card px-3 py-3 " style="padding:2rem!important">
-          <h3 class="text-center">Signin</h3>
-{% include "flash.html" %}
-          <form action="" method="post">
-  {{ form.csrf_token }}
-              <div class="mb-3">
-                 {{ form.username.label(class="form-control-label") }}
+<div class="w-25 mx-auto main-div" style="min-width:300px ">
+    <div class="container card px-3 py-3 " style="padding:1rem!important">
+        <h3 class="text-center">
+            Signin
+        </h3>
+        {% include "flash.html" %}
+        <form action="" method="post">
+            {{ form.csrf_token }}
+            <div class="mb-3">
+                {{ form.username.label(class="form-control-label") }}
                     {% if form.username.errors %}
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
                         {{ form.username(class="form-control ") }}
                     {% endif %}
-              </div>
-              <div class="mb-3">
-                 {{ form.password.label(class="form-control-label") }}
+            </div>
+            <div class="mb-3">
+                {{ form.password.label(class="form-control-label") }}
                     {% if form.password.errors %}
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
                         {{ form.password(class="form-control ") }}
                     {% endif %}
-              </div>
-              <div class="mb-3">
-              <div class="form-check-inline">
-              {{form.remember}}
-  <label class="form-check-label" for="inlineCheckbox1">{{ form.remember.label }}</label>
+            </div>
+            <div class="mb-3">
+                <div class="form-check-inline">
+                    {{form.remember}}
+                    <label class="form-check-label" for="inlineCheckbox1">
+                        {{ form.remember.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="d-grid gap-2">
+            {{ form.submit(class="btn btn-primary text-center ")}}
+            <p>Need an account?<a class="ms-1" href="/register">Create Account</a></p>
+            </div>
+           <p><a href="#">Forgot your password?</a></p>
+        </form>
+    </div>
 </div>
-</div>
-              
-  
-              
-              {{ form.submit(class="btn btn-primary text-center")}}
-            </form>
-        </div></div>
 {% endblock %}

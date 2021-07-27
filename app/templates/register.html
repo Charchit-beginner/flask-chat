@@ -1,71 +1,94 @@
 {% extends "layout.html" %}
 {% block body %}
-
-
-
-  <div class="w-25 mx-auto main-div" style="min-width:270px">
-        <div class="container card px-3 py-3" style="padding:2rem!important">
-          <h3 class="text-center">SignUp</h3>
-          {% include "flash.html" %}
-          <form action="" method="POST">
-      {{ form.csrf_token }}
-        <div class="form-group mt-2">
-             {{ form.username.label(class="form-control-label") }}
+<style type="text/css">
+   
+</style>
+<div class="w-25 mx-auto main-div" style="min-width:300px">
+    <div class="container card px-3 py-3" style="padding:1rem!important">
+        <h3 class="text-center">
+            SignUp
+        </h3>
+        {% include "flash.html" %}
+        <form action="" method="POST">
+            {{ form.csrf_token }}
+            <div class="form-group mt-2">
+                {{ form.username.label(class="form-control-label") }}
                     {% if form.username.errors %}
-                        {{ form.username(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.username(class="form-control ") }}
+                        {{ form.username(class="form-control form-control-lg is-invalid username") }}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                        {{ form.username(class="form-control username") }}
                     {% endif %}
-          </div>
-          <div class="form-group mt-2">
-            {{ form.email.label(class="form-control-label") }}
+            </div>
+            <div class="form-group mt-2">
+                {{ form.email.label(class="form-control-label") }}
                     {% if form.email.errors %}
                         {{ form.email(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
                         {{ form.email(class="form-control") }}
                     {% endif %}
-          </div>
-        
-      <div class="form-group mt-2">
- {{ form.password.label(class="form-control-label") }}
+            </div>
+            <div class="form-group mt-2">
+                {{ form.password.label(class="form-control-label") }}
                     {% if form.password.errors %}
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
                         {{ form.password(class="form-control") }}
                     {% endif %}
-          </div>
-        <div class="form-group mt-2">
- {{ form.confirm_password.label(class="form-control-label") }}
+            </div>
+            <div class="form-group mt-2">
+                {{ form.confirm_password.label(class="form-control-label") }}
                     {% if form.confirm_password.errors %}
                         {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.confirm_password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.confirm_password(class="form-control ") }}
+                <div class="invalid-feedback">
+                    {% for error in form.confirm_password.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                        {{ form.confirm_password(class="form-control") }}
                     {% endif %}
-        </div>
-          <div class="d-grid gap-2 mt-2">
-            {{ form.submit(class="btn btn-primary text-center ")}}
-          </div>
-    </form>
-        </div>
-      </div>
-  {% endblock %}
+            </div>
+            <div class="d-grid gap-2 mt-2">
+                {{ form.submit(class="btn btn-primary text-center submit")}}
+                <p>Already have account?<a class="ms-1" href="/signin">Sign In</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+    socket = io.connect(document.href);
+    $(".submit").submit(function(){
+        alert("fs")
+    
+        
+    })
+socket.emit("register","charchit")
+
+
+})
+</script>
+{% endblock %}

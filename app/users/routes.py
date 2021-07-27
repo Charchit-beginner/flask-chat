@@ -21,6 +21,7 @@ def register():
         user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
         db.session.add(user)
         db.session.commit()
+
         return redirect("/signin")
     return render_template("register.html",form=form)
 
