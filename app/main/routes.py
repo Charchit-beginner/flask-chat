@@ -6,14 +6,13 @@ from flask_socketio import emit, send
 from app.models import *
 import jsonpickle
 
+
+
+# jsonpickle.encode(user), mimetype='application/json' use this to send list
+
 main = Blueprint('main', __name__)
 
 
-@socketio.on('register')
-def test_connect(auth):
-    print(auth)
-    user = Detail.query.filter_by(username=auth).first()
-    emit("regis",jsonpickle.encode(user), mimetype='application/json',broadcast=True , include_self=False)
 
 @socketio.on('connect')
 def test_connect(auth):

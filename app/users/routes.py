@@ -10,6 +10,13 @@ users = Blueprint('users', __name__)
 
 
 
+@socketio.on('register',namespace="/register")
+def test_connect(data):
+    user = Detail.query.filter_by(username=data).first()
+    print(user)
+    if user:
+        emit("regis",user.username,broadcast=True ,include_self=False)
+    return "one"
     
 @users.route("/register",methods=["GET", "POST"])
 def register():
@@ -21,7 +28,6 @@ def register():
         user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
         db.session.add(user)
         db.session.commit()
-
         return redirect("/signin")
     return render_template("register.html",form=form)
 

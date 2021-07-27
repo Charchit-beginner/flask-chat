@@ -83,6 +83,21 @@
         socket = io.connect(document.href );
 socket.on("regis", data => {
     console.log(data)
+    $(".user").append(` <div class="align-items-center d-flex">
+                            <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
+                            </img>
+                            <div class="ps-2" style="white-space: nowrap;">
+                                <span class="fw-bold">
+                                    ${data}
+                                </span>
+                                <br>
+                                    <span>
+                                        How are you? I am fine
+                                    </span>
+                                </br>
+                            </div>
+                        </div>
+                        <hr style="margin: 6px 0px;">`)
   })
 
         

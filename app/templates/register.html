@@ -72,7 +72,7 @@
                     {% endif %}
             </div>
             <div class="d-grid gap-2 mt-2">
-                {{ form.submit(class="btn btn-primary text-center submit")}}
+                {{ form.submit(class="btn btn-primary text-center")}}
                 <p>Already have account?<a class="ms-1" href="/signin">Sign In</a></p>
             </div>
         </form>
@@ -81,13 +81,12 @@
 <script type="text/javascript">
     $(document).ready(function(){
     socket = io.connect(document.href);
-    $(".submit").submit(function(){
-        alert("fs")
-    
-        
+    $("#submit").click(function(){    
+        socket.emit("register",$(".username").val())
     })
-socket.emit("register","charchit")
-
+socket.on("regis", data => {
+    console.log(data)
+})
 
 })
 </script>
