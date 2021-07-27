@@ -9,25 +9,25 @@ from app.models import *
 users = Blueprint('users', __name__)
 
 
-
-@socketio.on('register',namespace="/register")
 def test_connect(data):
-    user = Detail.query.filter_by(username=data).first()
-    print(user)
-    if user:
-        emit("regis",user.username,broadcast=True ,include_self=False)
+    emit("regis",data,broadcast=True  ,namespace="/")
     return "one"
+
+def make(name):
+    socketio.emit("regis",name ,broadcast=True ,include_self=False)
+
     
 @users.route("/register",methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
         flash("It looks like You are already Registered","info")
-        return redirect("/contacts")
+        return redirect("/")
     form = RegistrationForm()
     if request.method=="POST" and form.validate_on_submit():
         user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
         db.session.add(user)
         db.session.commit()
+        socketio.on_event('register', test_connect(user.username),namespace="/")
         return redirect("/signin")
     return render_template("register.html",form=form)
 
@@ -37,7 +37,7 @@ def register():
 def signin():
     if current_user.is_authenticated:
         flash("It looks like you are already logined to site","info")
-        return redirect("/contacts")
+        return redirect("/")
     form = LoginForm()
     if request.method=="POST" and form.validate_on_submit():
         user = Detail.query.filter_by(username=form.username.data,password=form.password.data).first()
@@ -47,7 +47,7 @@ def signin():
             flash("Logined successfully","success")
         else:
             flash("Unsuccessful Login. Please Try Again","danger")
-        return redirect("/contacts")
+        return redirect("/")
 
     return render_template("signin.html",form=form)
 

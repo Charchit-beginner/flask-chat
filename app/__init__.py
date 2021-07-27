@@ -6,7 +6,7 @@ from flask_login import LoginManager
 
 app = Flask(__name__)
 db = SQLAlchemy()
-socketio = SocketIO()
+socketio = SocketIO(logger=True, engineio_logger=True)
 login_manager = LoginManager() 
 login_manager.login_view = 'users.signin'
 login_manager.login_message = "Login To Continue"

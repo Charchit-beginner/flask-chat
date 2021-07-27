@@ -11,7 +11,7 @@ a{
 }
 @media only screen and (max-width: 575px){
 .card{
-    position:absolute;
-    height:100%;
+    position:absolute!important;
+    height:100%!important;
 }
 }
