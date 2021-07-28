@@ -15,11 +15,27 @@ class Detail(db.Model,UserMixin):
     email = db.Column(db.String(35),  nullable=False)
     password = db.Column(db.String(15), nullable=False)
     date = db.Column(db.String(15), default=datetime.now())
-    user_message = db.relationship("Message", backref="owner",cascade="all, delete, delete-orphan")
+    user_message1 = db.relationship("Msg1", backref="owner1",cascade="all, delete, delete-orphan")
+    user_message2 = db.relationship("Msg2", backref="owner2",cascade="all, delete, delete-orphan")
 
-class Message(db.Model):
-	sno = db.Column(db.Integer, primary_key=True)
-	messages = db.Column(db.String(1000))
-	username = db.Column(db.String(20),db.ForeignKey("detail.username"))
-	get_user = db.Column(db.String(20))
 
+class Msg1(db.Model):
+    sid = db.Column(db.Integer, primary_key=True)
+    smsg = db.Column(db.String(1000))
+    msg_type =  db.Column(db.String(3))
+    susername = db.Column(db.String(20),db.ForeignKey("detail.username"))
+    sget_user = db.Column(db.String(20))
+
+class Msg2(db.Model):
+    rid = db.Column(db.Integer, primary_key=True)
+    rmsg = db.Column(db.String(1000))
+    rmsg_type =  db.Column(db.String(3))
+    rusername = db.Column(db.String(20),db.ForeignKey("detail.username"))
+    rget_user = db.Column(db.String(20))
+
+
+# from app import db,create_app
+# from app.models import *
+# app = create_app()
+# with app.app_context():
+#     db.create_all()

@@ -78,13 +78,20 @@
    })
   $("#send").click(function(e){
     // e.preventDefault()
-    socket.emit("message",$("#my_inp").val())
-    write($("#my_inp").val(),"right")
+    socket.emit("message",{msg:$("#my_inp").val(),user:"{{user.username}}"})
+    // write($("#my_inp").val(),"right")
     $("#my_inp").val("")
   })
   socket.on("msg", data => {
     console.log(data)
-    write(data,"left")
+    if (data.user == "{{current_user.username}}"){
+      if (data.rec_user == document.location.pathname.slice(6)) {
+      write(data.msg,"right")  
+      }
+    }
+    else if (data.user == document.location.pathname.slice(6)) {
+      write(data.msg,"left")
+    }
   })
 });
    </script>

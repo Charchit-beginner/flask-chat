@@ -1,4 +1,4 @@
-from  flask import Flask,Blueprint,render_template,session,request,redirect,flash,Response
+from  flask import Flask,Blueprint,render_template,session,request,redirect,flash,Response,abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user, login_required
 from app import socketio,db
@@ -9,6 +9,9 @@ import jsonpickle
 import functools
 from flask_login import current_user
 from flask_socketio import disconnect
+
+users = {}
+sids = {}
 
 def authenticated_only(f):
     @functools.wraps(f)
@@ -27,17 +30,30 @@ main = Blueprint('main', __name__)
 
 @socketio.on('connect')
 def test_connect(auth):
+    print(users)
+    sids[request.sid] = current_user.username
+    users[current_user.username] = request.sid
     emit('connected', {'data': 'Connected'})
 
 @socketio.on('disconnect')
 def test_disconnect():
+    del sids[request.sid]
     print('Client disconnected')
 
 @socketio.on('message')
 @authenticated_only
 def handle_message(data):
-    emit('msg', data  , include_self=False)
-    print(data)
+    # if current_user.username == data[]
+    # msg = Msg1(smsg=data["msg"],msg_type=,sget_user=data["user"],owner1=current_user)
+    for i in sids:
+        if sids[i] == data["user"] or sids[i] == current_user.username:
+            print(data)
+            emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"]} , room=i)
+
+
+
+ # users = {charchit:sfsfs,charhit1:sefegr}
+ # sid = {sfsfs:charchit,srfegsf:charchit,sefegr:charchit1}
 
 @main.route("/")  
 @login_required

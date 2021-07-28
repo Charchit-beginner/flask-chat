@@ -11,10 +11,7 @@ users = Blueprint('users', __name__)
 
 def test_connect(data):
     emit("regis",data,broadcast=True  ,namespace="/")
-    return "one"
 
-def make(name):
-    socketio.emit("regis",name ,broadcast=True ,include_self=False)
 
     
 @users.route("/register",methods=["GET", "POST"])
@@ -27,7 +24,7 @@ def register():
         user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        socketio.on_event('register', test_connect(user.username),namespace="/")
+        socketio.on_event('register', test_connect,namespace="/")
         return redirect("/signin")
     return render_template("register.html",form=form)
 
