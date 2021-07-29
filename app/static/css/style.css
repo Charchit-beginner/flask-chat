@@ -23,6 +23,30 @@
     border-radius: 15px;
     height: 500px;
 }
+#container::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+}
+#container::-webkit-scrollbar-thumb {
+    background: rgb(197 197 197);
+    border-radius: 10px;
+}
+#container::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: transparent;
+}
+#container::-webkit-scrollbar-thumb:active {
+    background-color: rgb(171 166 166);
+}
+.scroll {
+    position: absolute;
+    bottom: 58px;
+    right: 1px;
+    border-radius: 50%;
+    outline: none;
+    display: none;
+    z-index: 3;
+}
 @media only screen and (max-width: 575px) {
     .input-group {
         margin-bottom: 0px!important;

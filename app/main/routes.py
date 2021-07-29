@@ -30,25 +30,32 @@ main = Blueprint('main', __name__)
 
 @socketio.on('connect')
 def test_connect(auth):
-    print(users)
-    sids[request.sid] = current_user.username
-    users[current_user.username] = request.sid
-    emit('connected', {'data': 'Connected'})
+    if not current_user.is_anonymous:
+        print(users)
+        sids[request.sid] = current_user.username
+        users[current_user.username] = request.sid
+        emit('connected', {'data': 'Connected'})
 
 @socketio.on('disconnect')
 def test_disconnect():
-    del sids[request.sid]
-    print('Client disconnected')
+    if not current_user.is_anonymous:
+        del sids[request.sid]
+        print('Client disconnected')
 
 @socketio.on('message')
 @authenticated_only
 def handle_message(data):
-    # if current_user.username == data[]
-    # msg = Msg1(smsg=data["msg"],msg_type=,sget_user=data["user"],owner1=current_user)
-    for i in sids:
-        if sids[i] == data["user"] or sids[i] == current_user.username:
-            print(data)
-            emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"]} , room=i)
+    if not current_user.is_anonymous:
+        rec_user = Detail.query.filter_by(username=data["user"]).first()
+        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user)
+        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user)
+        db.session.add(msg)
+        db.session.add(msg1)
+        db.session.commit()
+        for i in sids:
+            if sids[i] == data["user"] or sids[i] == current_user.username:
+                print(data)
+                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"]} , room=i)
 
 
 
@@ -65,5 +72,6 @@ def index():
 @login_required
 def chat(user):
     user = Detail.query.filter_by(username=user).first()
-    return render_template("index.html",user=user) 
+    message = Message.query.filter_by(username=current_user.username,get_user=user.username).all()
+    return render_template("index.html",user=user,message=message) 
 

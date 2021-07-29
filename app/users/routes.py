@@ -24,7 +24,7 @@ def register():
         user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        socketio.on_event('register', test_connect,namespace="/")
+        socketio.on_event('register', test_connect(user.username),namespace="/")
         return redirect("/signin")
     return render_template("register.html",form=form)
 
