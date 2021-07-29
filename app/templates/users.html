@@ -49,9 +49,9 @@
                     </div>
                     <div class="user">
                         {% if users|length == 0%}
-                        <div class="d-flex align-items-center justify-content-center h-100 empty">
+                        <div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
                             <p class="text-center text-muted">
-                                It's empty for now.
+                                It's empty for now. No user to chat.
                             </p>
                         </div>
                         {% endif %}
@@ -64,8 +64,21 @@
                                     {{user.username}}
                                 </a>
                                 <br>
-                                    <span>
-                                        How are you? I am fine
+                                    <span class="span">
+                                        {% for i in msg %}
+                                        {% if i.get_user == user.username %}
+                                        {% if i.msg_type == "right" %}
+                                        You: {{i.msg}}
+                                        {% else %}
+                                        {{i.msg}}
+                                        
+                                        {% endif %}
+
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        
+                                    
                                     </span>
                                 </br>
                             </div>
@@ -81,6 +94,14 @@
     <script type="text/javascript">
         $(document).ready(function(){
         socket = io.connect(document.href );
+socket.on("msg",data=>{
+    data.rec_user == "{{current_user.username}}" ? $(`a[href="/chat/${data.user}"]`).next().next().html(data.msg) : $(`a[href="/chat/${data.rec_user}"]`).next().next().html(`You: ${data.msg}`)    
+
+
+    
+
+})
+
 socket.on("regis", data => {
     console.log(data)
     $(".empty").remove()
@@ -116,6 +137,7 @@ socket.on("regis", data => {
         $(".p-desc").removeClass("d-none")
         $("#my_inp").addClass("d-none")
     })
+
 })
     </script>
     {% endblock %}

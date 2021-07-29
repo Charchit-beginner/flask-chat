@@ -46,17 +46,17 @@ def test_disconnect():
 @authenticated_only
 def handle_message(data):
     if not current_user.is_anonymous:
+        for i in sids:
+            if sids[i] == data["user"] or sids[i] == current_user.username:
+                print(data)
+                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"]} , room=i)
         rec_user = Detail.query.filter_by(username=data["user"]).first()
         msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user)
         msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user)
         db.session.add(msg)
         db.session.add(msg1)
         db.session.commit()
-        for i in sids:
-            if sids[i] == data["user"] or sids[i] == current_user.username:
-                print(data)
-                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"]} , room=i)
-
+        return "done!"
 
 
  # users = {charchit:sfsfs,charhit1:sefegr}
@@ -66,7 +66,12 @@ def handle_message(data):
 @login_required
 def index():
     users = Detail.query.filter(Detail.username!=current_user.username).all()
-    return render_template("users.html",users=users)
+    # message = current_user.user_message1
+    a= []
+    for  i in users:
+        message = Message.query.filter_by(username=current_user.username,get_user=i.username).order_by(Message.id.desc()).first()
+        a.append(message)
+    return render_template("users.html",users=users,msg=a)
 
 @main.route("/chat/<user>")
 @login_required
@@ -74,4 +79,3 @@ def chat(user):
     user = Detail.query.filter_by(username=user).first()
     message = Message.query.filter_by(username=current_user.username,get_user=user.username).all()
     return render_template("index.html",user=user,message=message) 
-
