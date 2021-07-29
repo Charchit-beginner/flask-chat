@@ -4,8 +4,8 @@
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
     {% endblock %}
     {% block body %}
-            <div class="w-25 mx-auto main-div" style="min-width:300px;">
-        <div class="container card px-0 pb-3 pt-2" >
+            <div class="w-25 mx-auto main-div">
+        <div class="container card px-0 pb-3 pt-2" style="padding:0px!important" >
           {% include "flash.html" %}
           <div class="d-flex mb-2 ">
                     <div class="d-flex align-items-center ms-3">
@@ -26,7 +26,13 @@
                 </div>
     <div id="container" style="overflow-y: auto; height:100%; background: #f8f8f8">
       {% for i in message %}
+      
+        <div class="d-flex" style="float: {{i.msg_type}}; clear: both; margin: 5px; ">
+          {% if i.msg_type == "left" %}
+        <img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>
+        {% endif %}
         <div class="message {{i.msg_type}}">{{i.msg}}</div>
+      </div>
       {% endfor %}
        <button class="scroll btn btn-light btn-sm" type="button" ><i class="fas fa-angle-down" ></i></button>
     </div>
@@ -46,6 +52,11 @@
     <script src="{{url_for('static',filename='app.js')}}"></script>
 
    <script type="text/javascript">
+    function resize_div(){
+      $(".message").css({"max-width":`${$(".card").width()-100}px` })
+    }
+
+
      function write(msg, pos,direct ) {
     var msg1 = document.createElement("div")
 
@@ -62,12 +73,17 @@
     //     audio.play()
     // }
     container.scrollTop = container.scrollHeight - container.clientHeight;
-
+    resize_div()
 }
 
  $(document).ready(function(){
-  container.scrollTop = container.scrollHeight - container.clientHeight;
+   resize_div()
+  $(window).resize( function(){
+    resize_div()
 
+});
+  container.scrollTop = container.scrollHeight - container.clientHeight;
+      
       $(container).scroll(function(){
 
             if (container.scrollTop < container.scrollHeight - container.clientHeight){
