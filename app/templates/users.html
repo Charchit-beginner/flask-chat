@@ -12,17 +12,17 @@
                     <div class="col d-flex">
                         <div class="d-flex">
                             <img class="rounded-circle border pfp border-dark" height="50" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="50">
-                            </img>
+                            
                         </div>
                         <div class="ps-2">
-                            <span class="fw-bold">
+                            <span class="fw-bold fs-5">
                                 {{current_user.username}}
                             </span>
                             <br>
                                 <span>
                                     Active
                                 </span>
-                            </br>
+                           
                         </div>
                     </div>
                     <div class="col">
@@ -45,7 +45,7 @@
                                 <i class="fas fa-window-close fa-1x">
                                 </i>
                             </button>
-                        </input>
+                        
                     </div>
                     <div class="user">
                         {% if users|length == 0%}
@@ -56,15 +56,16 @@
                         </div>
                         {% endif %}
                         {% for user in users %}
-                        <div class="align-items-center d-flex">
+                        <a href="/chat/{{user.username}}" >
+                        <div class="align-items-center d-flex hover py-2">
                             <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
-                            </img>
+                            
                             <div class="ps-2" style="white-space: nowrap;">
-                                <a class="fw-bold" href="/chat/{{user.username}}">
+                                <span class="fw-bold text-dark fs-5">
                                     {{user.username}}
-                                </a>
+                                </span>
                                 <br>
-                                    <span class="span">
+                                    <span class="span fs-6 fw-lighter text-dark">
                                         {% for i in msg %}
                                         {% if i.get_user == user.username %}
                                         {% if i.msg_type == "right" %}
@@ -79,15 +80,19 @@
 
                                         
                                     
-                                    </span>
-                                </br>
+                                </span>
+
                             </div>
+                            <div class="status w-100 position-relative " >
+                                    <i class="fa fa-circle float-end" aria-hidden="true" style="font-size:10px;"></i>
+                                </div>
                         </div>
-                        <hr style="margin: 6px 0px;">
+                    </a>
+                        <hr class="m-0">
                             {% endfor %}
-                        </hr>
+                       
                     </div>
-                </hr>
+                
             </div>
         </div>
     </div>
@@ -95,7 +100,8 @@
         $(document).ready(function(){
         socket = io.connect(document.href );
 socket.on("msg",data=>{
-    data.rec_user == "{{current_user.username}}" ? $(`a[href="/chat/${data.user}"]`).next().next().html(data.msg) : $(`a[href="/chat/${data.rec_user}"]`).next().next().html(`You: ${data.msg}`)    
+    data.rec_user == "{{current_user.username}}" ? $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg) : $($($(`a[href="/chat/${data.rec_user}"]`).children().children()[1]).children()[2]).html(`You: ${data.msg}`)    
+
 
 
     
@@ -105,21 +111,24 @@ socket.on("msg",data=>{
 socket.on("regis", data => {
     console.log(data)
     $(".empty").remove()
-    $(".user").append(`<div class="align-items-center d-flex">
-                            <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
-                            </img>
-                            <div class="ps-2" style="white-space: nowrap;">
-                                <a class="fw-bold" href="/chat/${data}">
-                                    ${data}
-                                </a>
-                                <br>
-                                    <span>
-                                        How are you? I am fine
-                                    </span>
-                                </br>
-                            </div>
-                        </div>
-                        <hr style="margin: 6px 0px;">`)
+    $(".user").append(`<a href="/chat/${data}">
+    <div class="align-items-center d-flex hover py-2">
+        <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
+            <div class="ps-2" style="white-space: nowrap;">
+                <span class="fw-bold text-dark fs-5">
+                    ${data}
+                </span>
+                <br>
+                    <span class="span fs-6 fw-lighter text-dark">
+
+                    </span>
+                </br>
+            </div>
+        </img>
+    </div>
+</a>
+<hr class="m-0"/>
+`)
   })
 
         

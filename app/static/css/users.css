@@ -6,6 +6,15 @@
 .search:hover {
     cursor: pointer;
 }
+.text-dark:hover{
+    color:#484b4e!important;
+}
+.hover{
+    transition: 0.3s ease;
+}
+.hover:hover{
+    background-color:#ebebeb;
+}
 .user::-webkit-scrollbar {
     width: 6px;
     height: 10px;
