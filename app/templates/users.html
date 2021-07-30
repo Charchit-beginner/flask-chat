@@ -72,9 +72,7 @@
                                         You: {{i.msg}}
                                         {% else %}
                                         {{i.msg}}
-                                        
                                         {% endif %}
-
                                         {% endif %}
                                         {% endfor %}
 
@@ -83,7 +81,7 @@
                                 </span>
 
                             </div>
-                            <div class="status w-100 position-relative " >
+                            <div class="status w-100 position-relative text-{{user.status}}" >
                                     <i class="fa fa-circle float-end" aria-hidden="true" style="font-size:10px;"></i>
                                 </div>
                         </div>
@@ -131,6 +129,9 @@ socket.on("regis", data => {
 `)
   })
 
+    socket.on("status", data =>{
+        console.log(data)
+    })
         
         $(".search").click(function(){
        $(this).hide() 

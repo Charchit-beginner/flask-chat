@@ -49,10 +49,10 @@ def handle_message(data):
         for i in sids:
             if sids[i] == data["user"] or sids[i] == current_user.username:
                 print(data)
-                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"]} , room=i)
+                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"],"date":str(datetime.now())[5:16]} , room=i)
         rec_user = Detail.query.filter_by(username=data["user"]).first()
-        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user)
-        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user)
+        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=str(datetime.now())[5:16])
+        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=str(datetime.now())[5:16])
         db.session.add(msg)
         db.session.add(msg1)
         db.session.commit()

@@ -9,8 +9,8 @@ from app.models import *
 users = Blueprint('users', __name__)
 
 
-def test_connect(data):
-    emit("regis",data,broadcast=True  ,namespace="/")
+# def new_user(data):
+#     emit("regis",data,broadcast=True  ,namespace="/")
 
 
     
@@ -24,7 +24,7 @@ def register():
         user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        socketio.on_event('register', test_connect(user.username),namespace="/")
+        socketio.emit('regis' ,user.username,broadcast=True)
         return redirect("/signin")
     return render_template("register.html",form=form)
 
@@ -40,7 +40,10 @@ def signin():
         user = Detail.query.filter_by(username=form.username.data,password=form.password.data).first()
         print(user)
         if user:
+            socketio.emit('status', {'user': form.username.data,"status":"Online"},broadcast=True)
             login_user(user, remember=form.remember.data)
+            user.status = "success"
+            db.session.commit()
             flash("Logined successfully","success")
         else:
             flash("Unsuccessful Login. Please Try Again","danger")
@@ -50,6 +53,9 @@ def signin():
 
 @users.route("/logout",methods=["POST"])
 def logout():
+    socketio.emit('status', {'user': current_user.username,"status":"Offline"},broadcast=True)
+    current_user.status = "secondary"
+    db.session.commit()
     logout_user()
     flash("You successfully logged out","success")
     return redirect("/signin")

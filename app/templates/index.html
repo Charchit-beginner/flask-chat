@@ -7,20 +7,24 @@
             <div class="w-25 mx-auto main-div">
         <div class="container card px-0 pb-3 pt-2" style="padding:0px!important" >
           {% include "flash.html" %}
-          <div class="d-flex " style="box-shadow: 0px 2px 10px rgb(0 0 0 / 25%);
-    z-index: 10;">
+          <div class="d-flex pb-2" style="box-shadow: 0px 2px 10px rgb(0 0 0 / 25%); z-index: 10; ">
                     <div class="d-flex align-items-center ms-3">
                       <a href="/"><i class="fa fa-arrow-left me-2" aria-hidden="true"></i></a>
                         <img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=35 height=35>
                         </img>
                     </div>
                     <div class="ps-2">
-                        <span class="fw-bold">
+                        <span class="fw-bold fs-4">
                             {{user.username}}
                         </span>
                         <br>
                             <span>
+                              {% if user.status == "success" %}
                                 Online
+                              {% else %}
+                                Offline
+                              {% endif %}
+                                
                             </span>
                         </br>
                     </div>
@@ -37,7 +41,7 @@
 
         
       
-        <div class="d-flex" style="float: {{i.msg_type}}; clear: both; margin: 5px; ">
+        <div class="d-flex mt-3" style="float: {{i.msg_type}}; clear: both; margin: 5px; ">
           {% if i.msg_type == "left" %}
         <img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>
         {% endif %}
@@ -66,21 +70,22 @@
       $(".message").css({"max-width":`${$(".card").width()-100}px` })
     }
 
+     function write(msg, pos ,date) {
 
-     function write(msg, pos ) {
-      d = Date()
-      date = `${d.getMonth()+1}-${d.getDate()} ${d.getHours()}-${d.getMinutes()}`
-      $("#container").append(`<div class="d-flex" style="float: ${pos}; clear: both; margin: 5px; ">
+      $("#container").append(`<div class="d-flex mt-3" style="float: ${pos}; clear: both; margin: 5px; ">
           ${pos=="left" ? 
       '<img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>' : ''
 }
         
-        <div class="message ${pos}">${msg}</div>
+        <div class="message ${pos}"> </div>
       </div>
       
       `
+
       )
-     
+     a = document.createTextNode(msg)
+      $(".message").last().append(a)
+      $(".message").last().append(`<sub class="ms-1">${date}</sub>`)
 
     container.scrollTop = container.scrollHeight - container.clientHeight;
     resize_div()
@@ -128,25 +133,28 @@
 
    })
   $("#send").click(function(e){
-    // e.preventDefault()
-    socket.emit("message",{msg:$("#my_inp").val(),user:"{{user.username}}"},(d)=>{
+    if ($("#my_inp").val() != ""){
+      socket.emit("message",{msg:$("#my_inp").val(),user:"{{user.username}}"},(d)=>{
       if (d == "done!"){
         console.log("client recieved the message")
       }
     })
-    // write($("#my_inp").val(),"right")
-    $("#my_inp").val("")
+      $("#my_inp").val("")
+
+    }
+    
+    
   })
   socket.on("msg", data => {
     $(".empty").remove()
     console.log(data)
     if (data.user == "{{current_user.username}}"){
       if (data.rec_user == document.location.pathname.slice(6)) {
-      write(data.msg,"right")  
+      write(data.msg,"right",data.date)  
       }
     }
     else if (data.user == document.location.pathname.slice(6)) {
-      write(data.msg,"left")
+      write(data.msg,"left",data.date)
     }
   })
 });
