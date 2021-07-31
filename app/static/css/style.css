@@ -8,24 +8,23 @@
 }
 .right {
     background: black;
-    color:white;
-    border-radius: 18px 0px 18px 18px; 
+    color: white;
+    border-radius: 18px 0px 18px 18px;
     float: right;
     clear: both;
 }
 .message {
-    transition:0.8s ;
-    margin-bottom:10px; 
+    transition: 0.8s;
+    margin-bottom: 10px;
     font-family: 'Poppins', sans-serif;
-box-shadow: 0px 0px 10px rgb(0 0 0 / 25%);
+    box-shadow: 0px 0px 10px rgb(0 0 0 / 25%);
     padding: 10px;
     font-size: 14px;
     word-wrap: break-word;
 }
-.message:hover{
+.message:hover {
     box-shadow: 0px 0px 20px rgb(0 0 0 / 25%);
 }
-
 .card {
     border-radius: 15px;
     height: 500px;
@@ -54,16 +53,12 @@ box-shadow: 0px 0px 10px rgb(0 0 0 / 25%);
     display: none;
     z-index: 3;
 }
-
-sup,sub{
+sup, sub {
     font-size: 8px;
 }
-
 @media only screen and (max-width: 575px) {
     .input-group {
         margin-bottom: 0px!important;
         height: 50px;
     }
-
-    
 }

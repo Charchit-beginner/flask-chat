@@ -40,10 +40,7 @@ def signin():
         user = Detail.query.filter_by(username=form.username.data,password=form.password.data).first()
         print(user)
         if user:
-            socketio.emit('status', {'user': form.username.data,"status":"Online"},broadcast=True)
             login_user(user, remember=form.remember.data)
-            user.status = "success"
-            db.session.commit()
             flash("Logined successfully","success")
         else:
             flash("Unsuccessful Login. Please Try Again","danger")
@@ -53,9 +50,6 @@ def signin():
 
 @users.route("/logout",methods=["POST"])
 def logout():
-    socketio.emit('status', {'user': current_user.username,"status":"Offline"},broadcast=True)
-    current_user.status = "secondary"
-    db.session.commit()
     logout_user()
     flash("You successfully logged out","success")
     return redirect("/signin")

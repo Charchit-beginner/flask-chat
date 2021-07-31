@@ -7,6 +7,11 @@ function myFunction(x) {
         $(".card").attr("class", "container card px-2 pt-2  justify-content-center")
         $("body").attr("class", "d-flex")
         $(".con").attr("class", "h-100 px-3 py-3 con")
+        $(".user").css({"height":$(".card").height() -142})
+        $(window).resize( function(){
+    $(".user").css({"height":$(".card").height() -142})
+
+});
     } else {
         $(".main-div").attr("class", "w-25 mx-auto main-div")
         $("body").attr("class", "d-flex min-vh-100 justify-content-center align-items-center")
@@ -15,7 +20,8 @@ function myFunction(x) {
         })
         $(".card").addClass("pb-3")
         $(".con").attr("class", "h-100  con")
-    }
+        $(".user").css({"height":"100%"})
+    }   
 }
 var x = window.matchMedia("(max-width: 575px)")
 myFunction(x)

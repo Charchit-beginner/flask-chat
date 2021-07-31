@@ -18,7 +18,7 @@
                             {{user.username}}
                         </span>
                         <br>
-                            <span>
+                            <span id="status">
                               {% if user.status == "success" %}
                                 Online
                               {% else %}
@@ -45,7 +45,10 @@
           {% if i.msg_type == "left" %}
         <img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>
         {% endif %}
+        <!-- <div> -->
+          <!-- <i class="fa fa-trash " aria-hidden="true" style="position: relative;top: 10px;"></i> -->
         <div class="message  {{i.msg_type}}">{{i.msg}} <sub>{{i.time}}</sub></div>
+        <!-- </div> -->
       </div>
       {% endfor %}
        <button class="scroll btn btn-light btn-sm" type="button" ><i class="fas fa-angle-down" ></i></button>
@@ -140,10 +143,13 @@
       }
     })
       $("#my_inp").val("")
-
     }
     
     
+  })
+
+  socket.on("status",data => {
+    $("#status").text(data.status)
   })
   socket.on("msg", data => {
     $(".empty").remove()

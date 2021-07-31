@@ -61,29 +61,22 @@
                             <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
                             
                             <div class="ps-2" style="white-space: nowrap;">
-                                <span class="fw-bold text-dark fs-5">
+                                <span class="fw-bold text-dark fs-5 main-data">
+                                   
+                                        <i class="status fa fa-circle text-{{user.status}} {{user.username}}" aria-hidden="true" ></i>
                                     {{user.username}}
+
                                 </span>
+                                
                                 <br>
                                     <span class="span fs-6 fw-lighter text-dark">
                                         {% for i in msg %}
-                                        {% if i.get_user == user.username %}
-                                        {% if i.msg_type == "right" %}
-                                        You: {{i.msg}}
-                                        {% else %}
-                                        {{i.msg}}
-                                        {% endif %}
-                                        {% endif %}
-                                        {% endfor %}
-
-                                        
-                                    
+                                        {% if i.get_user == user.username %}{% if i.msg_type == "right" %}
+                                        You: {{i.msg}}{% else %}{{i.msg}}{% endif %}{% endif %}{% endfor %}
                                 </span>
 
                             </div>
-                            <div class="status w-100 position-relative text-{{user.status}}" >
-                                    <i class="fa fa-circle float-end" aria-hidden="true" style="font-size:10px;"></i>
-                                </div>
+                            
                         </div>
                     </a>
                         <hr class="m-0">
@@ -99,13 +92,9 @@
         socket = io.connect(document.href );
 socket.on("msg",data=>{
     data.rec_user == "{{current_user.username}}" ? $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg) : $($($(`a[href="/chat/${data.rec_user}"]`).children().children()[1]).children()[2]).html(`You: ${data.msg}`)    
-
-
-
-    
-
 })
 
+document.querySelectorAll(".span").forEach(function(e){if (e.innerText == ""){e.innerText = "Hey There"}})
 socket.on("regis", data => {
     console.log(data)
     $(".empty").remove()
@@ -113,8 +102,8 @@ socket.on("regis", data => {
     <div class="align-items-center d-flex hover py-2">
         <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
             <div class="ps-2" style="white-space: nowrap;">
-                <span class="fw-bold text-dark fs-5">
-                    ${data}
+                <span class="fw-bold text-dark fs-5 main-data">
+                    
                 </span>
                 <br>
                     <span class="span fs-6 fw-lighter text-dark">
@@ -127,10 +116,20 @@ socket.on("regis", data => {
 </a>
 <hr class="m-0"/>
 `)
+
+     a = document.createTextNode(data)
+      $(".main-data").last().append(a)
   })
 
-    socket.on("status", data =>{
+
+        socket.on("status",data=>{
         console.log(data)
+        if (data.status == "Online"){
+            $(`.${data.user}`).attr("class",`status w-100 position-relative text-success ${data.user}`)
+        }else{
+            $(`.${data.user}`).attr("class",`status w-100 position-relative text-secondary ${data.user}`)
+        }
+
     })
         
         $(".search").click(function(){
@@ -148,6 +147,8 @@ socket.on("regis", data => {
         $("#my_inp").addClass("d-none")
     })
 
+
+  
 })
     </script>
     {% endblock %}

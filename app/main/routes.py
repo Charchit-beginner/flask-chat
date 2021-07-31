@@ -28,18 +28,29 @@ main = Blueprint('main', __name__)
 
 
 
+
+
+
 @socketio.on('connect')
 def test_connect(auth):
     if not current_user.is_anonymous:
-        print(users)
+        print(sids)
         sids[request.sid] = current_user.username
         users[current_user.username] = request.sid
         emit('connected', {'data': 'Connected'})
+        emit('status', {'user': current_user.username,"status":"Online"},broadcast=True)
+        current_user.status = "success"
+        db.session.commit()
 
 @socketio.on('disconnect')
 def test_disconnect():
     if not current_user.is_anonymous:
+        cur_sid = sids[request.sid]
         del sids[request.sid]
+        if not cur_sid in [i for i in sids.values()]:
+            emit('status', {'user': current_user.username,"status":"Offline"},broadcast=True)
+            current_user.status = "secondary"
+            db.session.commit()
         print('Client disconnected')
 
 @socketio.on('message')
