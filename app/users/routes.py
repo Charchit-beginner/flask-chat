@@ -44,7 +44,7 @@ def signin():
             flash("Logined successfully","success")
         else:
             flash("Unsuccessful Login. Please Try Again","danger")
-        return redirect("/")
+        return redirect(request.args.get("next") if request.args.get("next") else "/") 
 
     return render_template("signin.html",form=form)
 

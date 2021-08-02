@@ -125,9 +125,9 @@ socket.on("regis", data => {
         socket.on("status",data=>{
         console.log(data)
         if (data.status == "Online"){
-            $(`.${data.user}`).attr("class",`status w-100 position-relative text-success ${data.user}`)
+            $(`.${data.user}`).attr("class",`status fa fa-circle text-success ${data.user}`)
         }else{
-            $(`.${data.user}`).attr("class",`status w-100 position-relative text-secondary ${data.user}`)
+            $(`.${data.user}`).attr("class",`status fa fa-circle text-secondary ${data.user}`)
         }
 
     })
@@ -146,9 +146,6 @@ socket.on("regis", data => {
         $(".p-desc").removeClass("d-none")
         $("#my_inp").addClass("d-none")
     })
-
-
-  
 })
     </script>
     {% endblock %}

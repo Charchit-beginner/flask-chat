@@ -53,9 +53,7 @@
     display: none;
     z-index: 3;
 }
-sup, sub {
-    font-size: 8px;
-}
+
 @media only screen and (max-width: 575px) {
     .input-group {
         margin-bottom: 0px!important;

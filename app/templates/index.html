@@ -38,17 +38,15 @@
                         </div>
                       {% endif %}
       {% for i in message %}
-
-        
-      
         <div class="d-flex mt-3" style="float: {{i.msg_type}}; clear: both; margin: 5px; ">
           {% if i.msg_type == "left" %}
         <img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>
         {% endif %}
-        <!-- <div> -->
-          <!-- <i class="fa fa-trash " aria-hidden="true" style="position: relative;top: 10px;"></i> -->
-        <div class="message  {{i.msg_type}}">{{i.msg}} <sub>{{i.time}}</sub></div>
-        <!-- </div> -->
+        <div id="{{i.id}}" class="message  {{i.msg_type}}">
+        <div class="float-end ms-2 change_btn"><i class="fa-angle-down {{i.msg_type}} fas fa-1x" ></i></div>
+        {{i.msg}} 
+        <div style="font-size: 10px"><span class="float-end">{{i.time}}</span></div>
+        </div>
       </div>
       {% endfor %}
        <button class="scroll btn btn-light btn-sm" type="button" ><i class="fas fa-angle-down" ></i></button>
@@ -61,7 +59,9 @@
 
 </div>
 </div>
-
+  <ul class="dropdown-menu">
+    
+  </ul>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     
@@ -69,100 +69,188 @@
     <script src="{{url_for('static',filename='app.js')}}"></script>
 
    <script type="text/javascript">
-    function resize_div(){
-      $(".message").css({"max-width":`${$(".card").width()-100}px` })
+    function resize_div() {
+    $(".message").css({
+        "max-width": `${$(".card").width()-100}px`
+    })
     }
 
-     function write(msg, pos ,date) {
+    function hideMenu(e) {
+      
+      if (e.target.classList[0] != "fa-angle-down"){
+        drop.style.display = "none";
+      }
+      else{
+        menu(e)
+      }
+    }
 
-      $("#container").append(`<div class="d-flex mt-3" style="float: ${pos}; clear: both; margin: 5px; ">
-          ${pos=="left" ? 
-      '<img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>' : ''
-}
+    function menu(e) {
+     
+      let cl = e.target
+      if (cl.classList[0] == "message" || cl.classList[0] == "fa-angle-down"){
         
-        <div class="message ${pos}"> </div>
-      </div>
-      
-      `
-
-      )
-     a = document.createTextNode(msg)
-      $(".message").last().append(a)
-      $(".message").last().append(`<sub class="ms-1">${date}</sub>`)
-
-    container.scrollTop = container.scrollHeight - container.clientHeight;
-    resize_div()
-}
-
- $(document).ready(function(){
-   resize_div()
-  $(window).resize( function(){
-    resize_div()
-
-});
-  container.scrollTop = container.scrollHeight - container.clientHeight;
-      
-      $(container).scroll(function(){
-
-            if (container.scrollTop < container.scrollHeight - container.clientHeight){
-            $(".scroll").fadeIn()
+        e.preventDefault();
+        if (cl.classList[1] == "right") {
+          $(drop).html(`<li><button  class="delme dropdown-item">Delete for me</button></li><button class=" delev dropdown-item" >Delete For everyone</button></li>
+            <li><button  class="dropdown-item edit_chat">Edit Message</button>`)
+        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li>`)}
+        drop.style.display = "block"
+        drop.style.left = e.x + "px"
+        drop.style.top = e.y + "px"
+        if (e.target.id == ""){
+          ids = $(e.target).parent().parent().attr("id")
+          
         }
         else{
-            $(".scroll").fadeOut()
-
+        ids = e.target.id
+      }
+        $(".delot").click(function(){
+          console.log(ids)
+          socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+        })
+        $(".delme").click(function(){
+          socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+        })
+        $(".delev").click(function(){
+          socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+        })
+        $(".edit_chat").click(function(){
+          // $("#my_inp").val(e.target.innerText.slice(0,e.target.innerText.length-12))
+          // $("#my_inp").focus()
+          alert("Coming Soon!!")
+        })
         }
+      else{
+        
+        hideMenu(e)
+      }  
+        
+    }
 
-    })
-    $(".scroll").click(function (e){
-        container.scroll({
-            top:container.scrollHeight - container.clientHeight,
-            behavior:"smooth"
+    function write(msg, pos, date,id,user) {
+        $("#container").append(`<div class="d-flex mt-3" style="float: ${pos}; clear: both; margin: 5px; ">
+              ${pos=="left" ? 
+          '<img class="rounded-circle border pfp border-dark"  src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width=25 height=25>' : ''
+    }
+
+            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}">  <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
+            </div>
+          </div>
+          `)
+        a = document.createTextNode(msg)
+        $(".message").last().append(a)
+        $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${date}</span></div>`)
+        container.scrollTop = container.scrollHeight - container.clientHeight;
+        resize_div()
+    }
+
+
+    $(document).ready(function() {
+
+        drop = document.querySelector(".dropdown-menu")
+        div = document.querySelectorAll(".message")
+        btn = document.querySelectorAll(".change_btn")
+        document.oncontextmenu = menu
+        document.onclick = hideMenu;
+        div.forEach(e => {
+            e.oncontextmenu = menu
+        });
+        btn.forEach(e => {
+            e.onclick = menu
+        });
+        resize_div()
+        $(window).resize(function() {
+            resize_div()
+        });
+        container.scrollTop = container.scrollHeight - container.clientHeight;
+        $(container).scroll(function() {
+            if (container.scrollTop < container.scrollHeight - container.clientHeight) {
+                $(".scroll").fadeIn()
+            } else {
+                $(".scroll").fadeOut()
+            }
+        })
+        $(".scroll").click(function(e) {
+            container.scroll({
+                top: container.scrollHeight - container.clientHeight,
+                behavior: "smooth"
+            })
+        })
+        socket = io.connect(document.href);
+        socket.on('connect', function() {});
+        $(document).keypress(event => {
+          let timeout
+          if(event.which!=13){
+          typing=true
+          socket.emit('typing', {user:"{{user.username}}", typing:true})
+          
+        }
+            else{
+                $("#send").trigger("click")
+                clearTimeout(timeout)
+            }
+            timeout=setTimeout(() => {
+            socket.emit('typing', {user:"{{user.username}}", typing:false})
+          }, 5000) 
+        
+      })
+        
+        $("#send").click(function(e) {
+            if ($("#my_inp").val() != "") {
+                socket.emit("message", {
+                    msg: $("#my_inp").val(),
+                    user: "{{user.username}}"
+                }, (d) => {
+                    if (d == "done!") {
+                        console.log("client recieved the message")
+                    }
+                })
+                $("#my_inp").val("")
+            }
         })
 
-    })
+        socket.on("status", data => {
+          if (data.user != "{{current_user.username}}"){
+            $("#status").text(data.status)
+          }
+        })
+        socket.on("msg", data => {
+            $(".empty").remove()
+            console.log(data)
+            $("#status").text("Online")
+            if (data.user == "{{current_user.username}}") {
+                if (data.rec_user == document.location.pathname.slice(6)) {
+                    write(data.msg, "right", data.date,data.id,data.user)
+                }
+            } else if (data.user == document.location.pathname.slice(6)) {
+                write(data.msg, "left", data.date,data.id,data.user)
+            }
+        })
+        socket.on("change_ok", data =>{
+          console.log(data)
+          if (data.user == "{{current_user.username}}"){
+            $(`#${data.id}`).parent().remove()
+        }else{
+          if (data.type == "cur_d_all"){
+          $(`#${parseInt(data.id)+1}`).parent().remove()
+        }
+        }
+        })
 
-    socket = io.connect(document.href );
-    socket.on('connect', function() {
-        
-  });
-  socket.on("connected", data => {
-    console.log(data)
-  })
+      socket.on("type", data => {
 
-   $(document).keypress(event=>{
-    if (event.which == 13) {
-       $("#send").trigger("click")
-     }
-
-   })
-  $("#send").click(function(e){
-    if ($("#my_inp").val() != ""){
-      socket.emit("message",{msg:$("#my_inp").val(),user:"{{user.username}}"},(d)=>{
-      if (d == "done!"){
-        console.log("client recieved the message")
-      }
-    })
-      $("#my_inp").val("")
+    let original_status = $("#status").text()
+    if (data.user != "{{current_user.username}}"){
+    if (data.typing == true) {
+        $("#status").text("typing..")
     }
-    
-    
-  })
+    else {
+        $("#status").text("Online")
+    }
+  }
+})
 
-  socket.on("status",data => {
-    $("#status").text(data.status)
-  })
-  socket.on("msg", data => {
-    $(".empty").remove()
-    console.log(data)
-    if (data.user == "{{current_user.username}}"){
-      if (data.rec_user == document.location.pathname.slice(6)) {
-      write(data.msg,"right",data.date)  
-      }
-    }
-    else if (data.user == document.location.pathname.slice(6)) {
-      write(data.msg,"left",data.date)
-    }
-  })
-});
+    });
    </script>
     {% endblock %}
