@@ -39,7 +39,7 @@ def test_connect(auth):
         sids[request.sid] = current_user.username
         users[current_user.username] = request.sid
         emit('status', {'user': current_user.username,"status":"Online"},broadcast=True)
-        current_user.status = "success"
+        current_user.status = "Online"
         db.session.commit()
 
 @socketio.on('disconnect')
@@ -48,10 +48,11 @@ def test_disconnect():
         cur_sid = sids[request.sid]
         del sids[request.sid]
         if not cur_sid in [i for i in sids.values()]:
-            emit('status', {'user': current_user.username,"status":"Offline"},broadcast=True)
-            current_user.status = "secondary"
+            emit('status', {'user': current_user.username,"status":str(datetime.now())[5:16]},broadcast=True)
+            current_user.status = str(datetime.now())[5:16]
             db.session.commit()
         print('Client disconnected')
+
 
 @socketio.on('typing')
 @authenticated_only
@@ -102,7 +103,6 @@ def handle_message(data):
             if sids[i] == data["user"] or sids[i] == current_user.username:
                 print(data)
                 emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"],"date":str(datetime.now())[5:16],"id":msg.id} , room=i)
-        
         db.session.commit()
         return "done!"
 
