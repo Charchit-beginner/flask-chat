@@ -21,8 +21,10 @@
                             <span id="status">
                               {% if user.status == "Online" %}
                                 Online
-                              {% else %}
-                               last seen {{user.status}}
+                              {% elif user.status == "secondary" %}
+                               New User
+                               {% else %}
+                               Last Seen {{user.status}}
                               {% endif %}
                                 
                             </span>
@@ -53,13 +55,13 @@
     </div>
    
 <div class="input-group" style="box-shadow: 0px -3px 10px rgb(0 0 0 / 25%); z-index: 10;">
-  <input type="text" id="my_inp" class="form-control" placeholder="Type a message...">
+  <input type="text" id="my_inp" class="form-control" placeholder="Type a message..." autocomplete="off">
   <button class="btn btn-dark" type="submit" id="send"><i class="fab fa-telegram-plane"></i></button>
 </div>
 
 </div>
 </div>
-  <ul class="dropdown-menu">
+  <ul id="contextMenu" class="dropdown-menu">
     
   </ul>
 
@@ -84,7 +86,30 @@
         menu(e)
       }
     }
+    function position(event){
+          var mousePosition = {};
+    var menuPostion = {};
+    var menuDimension = {};
 
+    menuDimension.x = $(contextMenu).width();
+    menuDimension.y = $(contextMenu).height();
+    mousePosition.x = event.pageX;
+    mousePosition.y = event.pageY;
+
+    if (mousePosition.x + menuDimension.x > $(window).width() + $(window).scrollLeft()) {
+        menuPostion.x = mousePosition.x - menuDimension.x;
+    } else {
+        menuPostion.x = mousePosition.x;
+    }
+
+    if (mousePosition.y + menuDimension.y > $(window).height() + $(window).scrollTop()) {
+        menuPostion.y = mousePosition.y - menuDimension.y;
+    } else {
+        menuPostion.y = mousePosition.y;
+    }
+
+    return menuPostion;
+    }
     function menu(e) {
      
       let cl = e.target
@@ -96,8 +121,9 @@
             <li><button  class="dropdown-item edit_chat">Edit Message</button>`)
         } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li>`)}
         drop.style.display = "block"
-        drop.style.left = e.x + "px"
-        drop.style.top = e.y + "px"
+        pos = position(e)
+        drop.style.left = pos.x + "px"
+        drop.style.top = pos.y + "px"
         if (e.target.id == ""){
           ids = $(e.target).parent().parent().attr("id")
           
@@ -147,6 +173,8 @@
 
 
     $(document).ready(function() {
+
+
 
         drop = document.querySelector(".dropdown-menu")
         div = document.querySelectorAll(".message")
@@ -213,15 +241,16 @@
         })
 
         socket.on("status", data => {
+
           if (data.user != "{{current_user.username}}" && data.user == document.location.pathname.slice(6)){
 
-            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`last seen ${data.status}`)
+            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${data.status}`)
           }
         })
+
         socket.on("msg", data => {
             $(".empty").remove()
-            console.log(data)
-            $("#status").text("Online")
+            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${data.status}`)
             if (data.user == "{{current_user.username}}") {
                 if (data.rec_user == document.location.pathname.slice(6)) {
                     write(data.msg, "right", data.date,data.id,data.user)
@@ -231,7 +260,6 @@
             }
         })
         socket.on("change_ok", data =>{
-          console.log(data)
           if (data.user == "{{current_user.username}}" ){
             $(`#${data.id}`).parent().remove()
         }else{
@@ -242,7 +270,6 @@
         })
 
       socket.on("type", data => {
-        console.log(data)
     let original_status = $("#status").text()
     if (data.user == document.location.pathname.slice(6)){
     if (data.typing == true) {

@@ -6,7 +6,6 @@ from app import socketio,db
 from flask_socketio import emit, send, join_room, leave_room
 from app.models import *
 import jsonpickle
-
 import functools
 from flask_login import current_user
 from flask_socketio import disconnect
@@ -26,9 +25,6 @@ def authenticated_only(f):
 # jsonpickle.encode(user), mimetype='application/json' use this to send list
 
 main = Blueprint('main', __name__)
-
-
-
 
 
 
@@ -102,7 +98,7 @@ def handle_message(data):
         for i in list(sids):
             if sids[i] == data["user"] or sids[i] == current_user.username:
                 print(data)
-                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":data["user"],"date":str(datetime.now())[5:16],"id":msg.id} , room=i)
+                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":str(datetime.now())[5:16],"id":msg.id} , room=i)
         db.session.commit()
         return "done!"
 

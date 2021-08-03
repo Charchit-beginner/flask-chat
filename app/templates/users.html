@@ -74,9 +74,12 @@
                                 
                                 <br>
                                     <span id="to_{{user.username}}" class="span fs-6 fw-lighter text-dark">
+
                                         {% for i in msg %}
                                         {% if i.get_user == user.username %}{% if i.msg_type == "right" %}
-                                        You: {{i.msg}}{% else %}{{i.msg}}{% endif %}{% endif %}{% endfor %}
+                                        You: {{i.msg}}{% else %}{{i.msg}}{% endif %}
+                                        {% endif %}
+                                        {% endfor %}
                                 </span>
 
                             </div>
@@ -101,25 +104,29 @@ socket.on("msg",data=>{
 
 document.querySelectorAll(".span").forEach(function(e){if (e.innerText == ""){e.innerText = "Hey There"}})
 socket.on("regis", data => {
-    console.log(data)
     $(".empty").remove()
-    $(".user").append(`<a href="/chat/${data}">
-    <div class="align-items-center d-flex hover py-2">
-        <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
-            <div class="ps-2" style="white-space: nowrap;">
-                <span class="fw-bold text-dark fs-5 main-data">
-                    
-                </span>
-                <br>
-                    <span class="span fs-6 fw-lighter text-dark">
+    $(".user").append(`<a href="/chat/${data}" >
+                        <div class="align-items-center d-flex hover py-2">
+                            <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
+                            
+                            <div class="ps-2" style="white-space: nowrap;">
+                                <span class="fw-bold text-dark fs-5 main-data">
+                                        <i class="status fa fa-circle text-secondary ${data}" aria-hidden="true" ></i>
 
-                    </span>
-                </br>
-            </div>
-        </img>
-    </div>
-</a>
-<hr class="m-0"/>
+                                    <span  class="names"></span>
+
+                                </span>
+                                
+                                <br>
+                                    <span id="to_${data}" class="span fs-6 fw-lighter text-dark">
+                                        Hey There
+                                </span>
+
+                            </div>
+                            
+                        </div>
+                        <hr class="m-0">
+                    </a>
 `)
 
      a = document.createTextNode(data)
@@ -128,7 +135,6 @@ socket.on("regis", data => {
 
 
         socket.on("status",data=>{
-        console.log(data)
         if (data.status == "Online"){
             $(`.${data.user}`).attr("class",`status fa fa-circle text-success ${data.user}`)
         }else{
@@ -141,7 +147,6 @@ socket.on("regis", data => {
             spans = $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2])
             arr.add(spans.text())
     if (data.user != "{{current_user.username}}"){
-        console.log("hi")
     if (data.typing == true) {
         spans.html("<span style='color:green;font-weight:bold;'>Typing..<span>")
     }
@@ -175,19 +180,15 @@ const isnone = (currentValue) => currentValue.style.display == "none";
     var search = () =>{
         var filter = $("#my_inp").val().toUpperCase()
         var names = $(".user a .names")
-        console.log("ho")
         for  (i=0;i < names.length;i++){
-            console.log(names[i].innerText.toUpperCase().indexOf(filter))
             if (names[i].innerText.toUpperCase().indexOf(filter) > -1){
                 $(".user a")[i].style.display = "initial"
             }
             else{
              $(".user a")[i].style.display = "none"   
             }
-         console.log($(".user a").css("display"))   
         }
         
-        console.log(Array.prototype.slice.call($(".user a")).some((el)=>{el.style.display == "none"}))
         if (Array.prototype.slice.call($(".user a")).every(isnone)) {
             if ($(".nouser").length == 0) {
                 $(".user").append(` <div class=" nouser px-2 d-flex align-items-center justify-content-center h-100 empty">

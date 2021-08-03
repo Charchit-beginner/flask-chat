@@ -20,9 +20,9 @@ function myFunction(x) {
         })
         $(".card").addClass("pb-3")
         $(".con").attr("class", "h-100  con")
-        $(".user").css({"height":"100%"})
+        $(".user").css({"height":"283px"})
         $(window).resize( function(){
-        $(".user").css({"height":"100%"})
+        $(".user").css({"height":"283px"})
 
 
 });
