@@ -25,7 +25,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         socketio.emit('regis' ,user.username,broadcast=True)
-        return redirect("/signin")
+        return redirect("/")
     return render_template("register.html",form=form)
 
 

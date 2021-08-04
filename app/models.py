@@ -16,7 +16,7 @@ class Detail(db.Model,UserMixin):
     password = db.Column(db.String(15), nullable=False)
     date = db.Column(db.String(15), default=datetime.now())
     status = db.Column(db.String(10),default="secondary")
-    tagline = db.Column(db.String(10),default="Hey There")
+    last_active = db.Column(db.DateTime,default=datetime.now())
     user_message1 = db.relationship("Message", backref="owner",cascade="all, delete, delete-orphan")
 
 
@@ -26,7 +26,7 @@ class Message(db.Model):
     msg_type =  db.Column(db.String(5))
     username = db.Column(db.String(20),db.ForeignKey("detail.username"))
     get_user = db.Column(db.String(20))
-    time = db.Column(db.String(12))
+    time = db.Column(db.DateTime)
 
 
 

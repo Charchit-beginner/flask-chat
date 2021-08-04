@@ -5,6 +5,7 @@ from flask_login import current_user, login_required
 from app import socketio,db
 from flask_socketio import emit, send, join_room, leave_room
 from app.models import *
+from app.main.utils import *
 import jsonpickle
 import functools
 from flask_login import current_user
@@ -43,9 +44,11 @@ def test_disconnect():
     if not current_user.is_anonymous:
         cur_sid = sids[request.sid]
         del sids[request.sid]
+        print("noooooo")
         if not cur_sid in [i for i in sids.values()]:
-            emit('status', {'user': current_user.username,"status":str(datetime.now())[5:16]},broadcast=True)
-            current_user.status = str(datetime.now())[5:16]
+            emit('status', {'user': current_user.username,"status":format_date()},broadcast=True)
+            current_user.last_active =  datetime.now()
+            current_user.status = format_date()
             db.session.commit()
         print('Client disconnected')
 
@@ -90,15 +93,15 @@ def handle_change(data):
 def handle_message(data):
     if not current_user.is_anonymous:
         rec_user = Detail.query.filter_by(username=data["user"]).first()
-        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=str(datetime.now())[5:16])
-        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=str(datetime.now())[5:16])        
+        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.now())
+        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.now())        
         db.session.add(msg)
         db.session.add(msg1)
         db.session.flush()
         for i in list(sids):
             if sids[i] == data["user"] or sids[i] == current_user.username:
                 print(data)
-                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":str(datetime.now())[5:16],"id":msg.id} , room=i)
+                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
         db.session.commit()
         return "done!"
 
@@ -113,11 +116,16 @@ def handle_message(data):
 def index():
     users = Detail.query.filter(Detail.username!=current_user.username).all()
     # message = current_user.user_message1
-    a= []
+    a,b= [],[]
+
     for  i in users:
         message = Message.query.filter_by(username=current_user.username,get_user=i.username).order_by(Message.id.desc()).first()
+
+        msg = Message.query.filter(Message.username==current_user.username,Message.get_user==i.username,Message.time > current_user.last_active).all()
+        d = Message.query.filter(Message.username==current_user.username,Message.get_user==i.username).all()
+        b.append(msg)    
         a.append(message)
-    return render_template("users.html",users=users,msg=a)
+    return render_template("users.html",users=users,msg=a,unseen_msg=b)
 
 
 @main.route("/chat/<user>")

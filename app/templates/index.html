@@ -166,7 +166,7 @@
           `)
         a = document.createTextNode(msg)
         $(".message").last().append(a)
-        $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${date}</span></div>`)
+        $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${date.slice(5,16)}</span></div>`)
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()
     }

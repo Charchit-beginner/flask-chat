@@ -74,7 +74,6 @@
                                 
                                 <br>
                                     <span id="to_{{user.username}}" class="span fs-6 fw-lighter text-dark">
-
                                         {% for i in msg %}
                                         {% if i.get_user == user.username %}{% if i.msg_type == "right" %}
                                         You: {{i.msg}}{% else %}{{i.msg}}{% endif %}
@@ -83,9 +82,19 @@
                                 </span>
 
                             </div>
-                            
+                            <div class="d-flex justify-content-end w-100">
+                                <span class="rounded-circle bg-success text-light unseen" >
+                                {% for i in unseen_msg %}
+                                        {% for a in i%}
+                                        {% if a.get_user == user.username and a.msg_type == "left" and loop.index == 1%}
+                                        {{i|length}}
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% endfor %}
+                                        </span>
+                                    </div>
                         </div>
-                        <hr class="m-0">
+                        <hr class="m-0 text-dark">
                     </a>
                         
                             {% endfor %}
@@ -101,7 +110,9 @@
 socket.on("msg",data=>{
     data.rec_user == "{{current_user.username}}" ? $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg) : $($($(`a[href="/chat/${data.rec_user}"]`).children().children()[1]).children()[2]).html(`You: ${data.msg}`)    
 })
-
+        if ($(".unseen")[0].innerText == ""){
+            $(".unseen").hide()
+        }
 document.querySelectorAll(".span").forEach(function(e){if (e.innerText == ""){e.innerText = "Hey There"}})
 socket.on("regis", data => {
     $(".empty").remove()
@@ -125,7 +136,7 @@ socket.on("regis", data => {
                             </div>
                             
                         </div>
-                        <hr class="m-0">
+                        <hr class="m-0 text-dark">
                     </a>
 `)
 
