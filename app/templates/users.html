@@ -107,12 +107,18 @@
     <script type="text/javascript">
         $(document).ready(function(){
         socket = io.connect(document.href );
+        // last message shower
 socket.on("msg",data=>{
     data.rec_user == "{{current_user.username}}" ? $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg) : $($($(`a[href="/chat/${data.rec_user}"]`).children().children()[1]).children()[2]).html(`You: ${data.msg}`)    
+})      
+socket.on("change_ok",data => {
+    // date
+    // data.user == "{{current_user.username}}" ? :
+    $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg)
 })
-        if ($(".unseen")[0].innerText == ""){
-            $(".unseen").hide()
-        }
+        if ($(".unseen")[0]){
+             if ($(".unseen")[0].innerText == "") $(".unseen").hide()
+    }
 document.querySelectorAll(".span").forEach(function(e){if (e.innerText == ""){e.innerText = "Hey There"}})
 socket.on("regis", data => {
     $(".empty").remove()
@@ -144,7 +150,7 @@ socket.on("regis", data => {
       $(".main-data").last().append(a)
   })
 
-
+//  status shower
         socket.on("status",data=>{
         if (data.status == "Online"){
             $(`.${data.user}`).attr("class",`status fa fa-circle text-success ${data.user}`)
@@ -153,6 +159,7 @@ socket.on("regis", data => {
         }
 
     })
+        //  typing
         arr = new Set()
          socket.on("type", data => {
             spans = $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2])
@@ -167,7 +174,7 @@ socket.on("regis", data => {
     }
   }
 })
-        
+        // search of on
         $(".search").click(function(){
        $(this).hide() 
 

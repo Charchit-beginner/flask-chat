@@ -1,5 +1,6 @@
 from datetime import datetime
 
-def format_date(): 
-	return  datetime.now().strftime("%Y %b %d %H:%M:%S") 
+def format_date(date=None): 
+	return  datetime.utcnow().strftime("%Y %b %d %H:%M:%S") 
+
 

@@ -47,7 +47,7 @@ def test_disconnect():
         print("noooooo")
         if not cur_sid in [i for i in sids.values()]:
             emit('status', {'user': current_user.username,"status":format_date()},broadcast=True)
-            current_user.last_active =  datetime.now()
+            current_user.last_active =  datetime.utcnow()
             current_user.status = format_date()
             db.session.commit()
         print('Client disconnected')
@@ -73,7 +73,8 @@ def handle_change(data):
         if current_user.username == data["current_user"]:
             for i in list(sids):
                 if sids[i] == data["user"] or sids[i] == current_user.username:
-                    emit("change_ok",{"user":current_user.username,"id":data["id"],"type":data["type"]},room=i)            
+                    emit("change_ok",{"user":current_user.username,"id":data["id"],"type":data["type"],"msg":data["prev_msg"]},room=i) 
+
             if data["type"] == "user_d":
                 msg = Message.query.filter_by(id=data["id"],msg_type="left",username=current_user.username,get_user=data["user"]).first()
                 db.session.delete(msg)
@@ -93,8 +94,8 @@ def handle_change(data):
 def handle_message(data):
     if not current_user.is_anonymous:
         rec_user = Detail.query.filter_by(username=data["user"]).first()
-        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.now())
-        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.now())        
+        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.utcnow())
+        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
         db.session.add(msg)
         db.session.add(msg1)
         db.session.flush()

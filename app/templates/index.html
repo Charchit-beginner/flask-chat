@@ -47,7 +47,7 @@
         <div id="{{i.id}}" class="message  {{i.msg_type}}">
         <div class="float-end ms-2 change_btn"><i class="fa-angle-down {{i.msg_type}} fas fa-1x" ></i></div>
         {{i.msg}} 
-        <div style="font-size: 10px"><span class="float-end">{{i.time}}</span></div>
+        <div style="font-size: 10px"><span class="times float-end">{{i.time}}</span></div>
         </div>
       </div>
       {% endfor %}
@@ -131,15 +131,16 @@
         else{
         ids = e.target.id
       }
+      console.log(e)
+        previous_msg = e.target.parentElement.previousElementSibling.innerText.split("\n")[0]
         $(".delot").click(function(){
-          console.log(ids)
-          socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+          socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg})
         })
         $(".delme").click(function(){
-          socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+          socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg})
         })
         $(".delev").click(function(){
-          socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+          socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg})
         })
         $(".edit_chat").click(function(){
           // $("#my_inp").val(e.target.innerText.slice(0,e.target.innerText.length-12))
@@ -153,6 +154,12 @@
       }  
         
     }
+        const format_date = (date) => {
+          d = new Date(date + " UTC")
+          formatted_date = `${d.toDateString().slice(4,10)} ${d.toTimeString().slice(0,5)}`
+          
+          return formatted_date
+        }
 
     function write(msg, pos, date,id,user) {
         $("#container").append(`<div class="d-flex mt-3" style="float: ${pos}; clear: both; margin: 5px; ">
@@ -166,15 +173,19 @@
           `)
         a = document.createTextNode(msg)
         $(".message").last().append(a)
-        $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${date.slice(5,16)}</span></div>`)
+        $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${format_date(date)}</span></div>`)
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()
     }
 
 
     $(document).ready(function() {
-
-
+        let date = document.querySelector("#status")
+        if (date.innerText != "New User" && date.innerText != "Online") date.innerText = "Last Seen " +format_date(date.innerText)
+        msg_date = document.querySelectorAll(".times")
+        msg_date.forEach(e => {
+          e.innerText = format_date(e.innerText)
+        })
 
         drop = document.querySelector(".dropdown-menu")
         div = document.querySelectorAll(".message")
@@ -244,13 +255,13 @@
 
           if (data.user != "{{current_user.username}}" && data.user == document.location.pathname.slice(6)){
 
-            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${data.status}`)
+            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${format_date(data.status)}`)
           }
         })
 
         socket.on("msg", data => {
             $(".empty").remove()
-            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${data.status}`)
+            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${format_date(data.status)}`)
             if (data.user == "{{current_user.username}}") {
                 if (data.rec_user == document.location.pathname.slice(6)) {
                     write(data.msg, "right", data.date,data.id,data.user)
