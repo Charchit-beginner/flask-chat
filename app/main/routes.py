@@ -28,30 +28,53 @@ def authenticated_only(f):
 main = Blueprint('main', __name__)
 
 
-
 @socketio.on('connect')
 def test_connect(auth):
     if not current_user.is_anonymous:
         print(sids)
         sids[request.sid] = current_user.username
-        users[current_user.username] = request.sid
+        print(sids)
         emit('status', {'user': current_user.username,"status":"Online"},broadcast=True)
         current_user.status = "Online"
         db.session.commit()
 
+@socketio.on('connected')
+def get_id(data):
+    if not current_user.is_anonymous:
+        sids[request.sid] =  current_user.username + "user_contact"
+    print(sids)
+
 @socketio.on('disconnect')
 def test_disconnect():
+    print(request.namespace,request)
     if not current_user.is_anonymous:
         cur_sid = sids[request.sid]
         del sids[request.sid]
         print("noooooo")
-        if not cur_sid in [i for i in sids.values()]:
-            emit('status', {'user': current_user.username,"status":format_date()},broadcast=True)
+        print(sids,"dddddddddddd")
+        print(cur_sid.endswith("user_contact"),cur_sid)
+        if not cur_sid.endswith("user_contact") and not cur_sid in [i for  i in sids.values()]:
             current_user.last_active =  datetime.utcnow()
+            print("user relay")
+            db.session.commit()
+
+        if not cur_sid in [i for i in sids.values()] or (not cur_sid in [i for i in sids.values()] and cur_sid.endswith("user_contact")) :
+
+            emit('status', {'user': current_user.username,"status":format_date()},broadcast=True)
+            # if cur_sid in [i for  i in users.values()]:
+
             current_user.status = format_date()
             db.session.commit()
         print('Client disconnected')
 
+
+# @socketio.on('disconnect',namespace="/")
+# def dis():
+#     print("dis user from here")
+
+@socketio.on('f')
+def fid(d):
+    print(d)
 
 @socketio.on('typing')
 @authenticated_only
@@ -73,7 +96,7 @@ def handle_change(data):
         if current_user.username == data["current_user"]:
             for i in list(sids):
                 if sids[i] == data["user"] or sids[i] == current_user.username:
-                    emit("change_ok",{"user":current_user.username,"id":data["id"],"type":data["type"],"msg":data["prev_msg"]},room=i) 
+                    emit("change_ok",{"user":current_user.username,"id":data["id"],"type":data["type"]},room=i) 
 
             if data["type"] == "user_d":
                 msg = Message.query.filter_by(id=data["id"],msg_type="left",username=current_user.username,get_user=data["user"]).first()

@@ -111,11 +111,7 @@
 socket.on("msg",data=>{
     data.rec_user == "{{current_user.username}}" ? $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg) : $($($(`a[href="/chat/${data.rec_user}"]`).children().children()[1]).children()[2]).html(`You: ${data.msg}`)    
 })      
-socket.on("change_ok",data => {
-    // date
-    // data.user == "{{current_user.username}}" ? :
-    $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2]).html(data.msg)
-})
+
         if ($(".unseen")[0]){
              if ($(".unseen")[0].innerText == "") $(".unseen").hide()
     }
@@ -174,7 +170,9 @@ socket.on("regis", data => {
     }
   }
 })
-        // search of on
+         socket.on("connect", () => {
+            socket.emit("connected",document.location.pathname)
+});        // search of on
         $(".search").click(function(){
        $(this).hide() 
 

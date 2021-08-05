@@ -1,0 +1,50 @@
+### update message outside
+try{
+  previous_msg = e.target.parentElement.previousElementSibling.innerText.split("\n")[0]
+  cur_msg_ele = e.target.parentElement.parentElement 
+}
+catch{
+ cur_msg_ele = e.target.parentElement.parentElement
+ 
+ if (cur_msg_ele.classList[1] == "right"){
+ previous_msg = e.target.parentElement.parentElement.parentElement.previousElementSibling.innerText.split("\n")[0] 
+}
+else{
+  previous_msg = e.target.parentElement.previousElementSibling.innerText.split("\n")[0] 
+}
+}
+msg =  cur_msg_ele.innerText.split("\n")[0]
+console.log(msg)
+
+## sending data
+$(".delot").click(function(){
+  socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg,cur_msg:msg})
+})
+$(".delme").click(function(){
+  socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg,cur_msg:msg})
+})
+$(".delev").click(function(){
+  socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg,cur_msg:msg})
+})
+
+## updating users page
+socket.on("change_ok",data => {
+    // date
+    // data.user == "{{current_user.username}}" ? :
+    console.log(data)
+    if (data.cur_msg == document.getElementById(`to_${data.user}`).innerText){
+    $(`#to_${data.user}`).text(data.msg)
+}
+else{
+    console.log("hi")
+}
+})
+
+## edit message
+$(".edit_chat").click(function(){
+  // $("#my_inp").val(e.target.innerText.slice(0,e.target.innerText.length-12))
+  // $("#my_inp").focus()
+  alert("Coming Soon!!")
+})
+
+

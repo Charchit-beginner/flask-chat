@@ -132,19 +132,17 @@
         ids = e.target.id
       }
       console.log(e)
-        previous_msg = e.target.parentElement.previousElementSibling.innerText.split("\n")[0]
+      
         $(".delot").click(function(){
-          socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg})
+          socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}"})
         })
         $(".delme").click(function(){
-          socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg})
+          socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}"})
         })
         $(".delev").click(function(){
-          socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}",prev_msg:previous_msg})
+          socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}"})
         })
         $(".edit_chat").click(function(){
-          // $("#my_inp").val(e.target.innerText.slice(0,e.target.innerText.length-12))
-          // $("#my_inp").focus()
           alert("Coming Soon!!")
         })
         }
