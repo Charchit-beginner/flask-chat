@@ -14,10 +14,14 @@ class Detail(db.Model,UserMixin):
     username = db.Column(db.String(35),unique=True, nullable=False)
     email = db.Column(db.String(35),  nullable=False)
     password = db.Column(db.String(15), nullable=False)
-    date = db.Column(db.String(15), default=datetime.now())
     status = db.Column(db.String(10),default="secondary")
+    pic = db.Column(db.String(51),default="default.jpg")
     last_active = db.Column(db.DateTime,default=datetime.now())
+    otp_timing = db.Column(db.DateTime)
+    otp =  db.Column(db.Integer,nullable=True)
+    email_confirmed =  db.Column(db.Boolean, nullable=False, default=False)
     user_message1 = db.relationship("Message", backref="owner",cascade="all, delete, delete-orphan")
+    # def __init__()
 
 
 class Message(db.Model):

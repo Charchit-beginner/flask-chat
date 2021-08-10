@@ -7,9 +7,9 @@ function myFunction(x) {
         $(".card").attr("class", "container card px-2 pt-2  justify-content-center")
         $("body").attr("class", "d-flex")
         $(".con").attr("class", "h-100 px-3 py-3 con")
-        $(".user").css({"height":$(".card").height() -142})
+        $(".user").css({"height":$(".card").height() -170})
         $(window).resize( function(){
-        $(".user").css({"height":$(".card").height() -142})
+        $(".user").css({"height":$(".card").height() -170})
 
 });
     } else {
@@ -20,9 +20,9 @@ function myFunction(x) {
         })
         $(".card").addClass("pb-3")
         $(".con").attr("class", "h-100  con")
-        $(".user").css({"height":"283px"})
+        $(".user").css({"height":"284px"})
         $(window).resize( function(){
-        $(".user").css({"height":"283px"})
+        $(".user").css({"height":"284px"})
 
 
 });

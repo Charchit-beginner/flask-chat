@@ -4,12 +4,14 @@ from app.config import Config
 from flask_socketio import SocketIO
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_mail import Mail
 
 app = Flask(__name__)
 db = SQLAlchemy()
 migrate = Migrate()
 socketio = SocketIO()
 login_manager = LoginManager() 
+mail = Mail()
 login_manager.login_view = 'users.signin'
 login_manager.login_message = "Login To Continue"
 login_manager.login_message_category = 'info'
@@ -20,12 +22,15 @@ def create_app(config_class = Config):
 	db.init_app(app)
 	login_manager.init_app(app)
 	migrate.init_app(app, db)
+	mail.init_app(app)
 
 	from app.users.routes import users
 	from app.main.routes import main
+	from app.errors.error import errors
 
 	app.register_blueprint(users)
 	app.register_blueprint(main)
+	app.register_blueprint(errors)
 
 	socketio.init_app(app)
 

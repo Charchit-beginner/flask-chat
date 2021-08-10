@@ -48,3 +48,50 @@ $(".edit_chat").click(function(){
 })
 
 
+
+
+///
+   <div class="form-group mt-2">
+                {{ form.email.label(class="form-control-label my-1") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                        {{ form.email(class="form-control",autocomplete="off") }}
+                    {% endif %}
+            </div>
+
+// things to do
+
+1. fix mobile view profile and logout btn   - done
+4. update the image of the users on users page. - done
+5. back button on reset page. - done
+7. delete all the messages for me. -  done
+12. add 404 page and 500 page - done
+13. use abort for unknown users - done
+16. make code expire - done
+11. make env file - done
+15. make gitignore- done
+8. update unseen message on users page - done
+
+2. restrict user to send message after delete 
+3. make hash passwords and otps.
+14. try using different js files.
+10. finishing up - add checks
+
+// later ideas 
+1. make friends ,remove friends
+2. edit message
+3. seen unseen , better updating
+4. reply message
+5. make groups
+6. select messages
+7. make context menus and dropdowns animated - not done
+8. dark mode
+

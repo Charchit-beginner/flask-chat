@@ -1,4 +1,4 @@
-from  flask import Flask,Blueprint,render_template,session,request,redirect,flash,Response,abort
+from  flask import Flask,Blueprint,render_template,session,request,redirect,flash,Response,abort,url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_,and_,delete,select
 from flask_login import current_user, login_required
@@ -10,6 +10,7 @@ import jsonpickle
 import functools
 from flask_login import current_user
 from flask_socketio import disconnect
+from app.firebase import storage,firebase_user
 
 users = {}
 sids = {}
@@ -51,8 +52,6 @@ def test_disconnect():
         cur_sid = sids[request.sid]
         del sids[request.sid]
         print("noooooo")
-        print(sids,"dddddddddddd")
-        print(cur_sid.endswith("user_contact"),cur_sid)
         if not cur_sid.endswith("user_contact") and not cur_sid in [i for  i in sids.values()]:
             current_user.last_active =  datetime.utcnow()
             print("user relay")
@@ -72,17 +71,13 @@ def test_disconnect():
 # def dis():
 #     print("dis user from here")
 
-@socketio.on('f')
-def fid(d):
-    print(d)
-
 @socketio.on('typing')
 @authenticated_only
 def typing(data):
     print(data)
     if not current_user.is_anonymous:
         for i in list(sids):
-            if sids[i] == data["user"] or sids[i] == current_user.username:
+            if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
                 emit("type",{"typing":data["typing"],"user":current_user.username},room=i)
                     
 
@@ -95,7 +90,7 @@ def handle_change(data):
     if not current_user.is_anonymous:
         if current_user.username == data["current_user"]:
             for i in list(sids):
-                if sids[i] == data["user"] or sids[i] == current_user.username:
+                if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
                     emit("change_ok",{"user":current_user.username,"id":data["id"],"type":data["type"]},room=i) 
 
             if data["type"] == "user_d":
@@ -112,6 +107,15 @@ def handle_change(data):
         db.session.commit()
         return "removed"
 
+@socketio.on('delete_all_msg')
+@authenticated_only
+def handle_message(data):
+    if not current_user.is_anonymous:
+        if current_user.username == data["current_user"]:
+            emit("deleted_all")
+            msgs = Message.query.filter_by(username=current_user.username,get_user=data["user"]).delete()
+            db.session.commit()
+
 @socketio.on('message')
 @authenticated_only
 def handle_message(data):
@@ -123,7 +127,8 @@ def handle_message(data):
         db.session.add(msg1)
         db.session.flush()
         for i in list(sids):
-            if sids[i] == data["user"] or sids[i] == current_user.username:
+
+            if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
                 print(data)
                 emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
         db.session.commit()
@@ -132,6 +137,11 @@ def handle_message(data):
 
  # users = {charchit:sfsfs,charhit1:sefegr}
  # sid = {sfsfs:charchit,srfegsf:charchit,sefegr:charchit1}
+
+@main.app_template_filter('get_img')
+def get_img(img):
+    return storage.child(img).get_url(firebase_user["idToken"]) if img != "default.jpg" else url_for('static',filename='images/default.jpg')
+
 
 
 
@@ -155,6 +165,9 @@ def index():
 @main.route("/chat/<user>")
 @login_required
 def chat(user):
-    user = Detail.query.filter_by(username=user).first()
-    message = Message.query.filter_by(username=current_user.username,get_user=user.username).all()
-    return render_template("index.html",user=user,message=message) 
+    
+    User = Detail.query.filter(Detail.username==user,Detail.username!=current_user.username).first()
+    if not User:
+        abort(404)
+    message = Message.query.filter_by(username=current_user.username,get_user=User.username).all()
+    return render_template("index.html",user=User,message=message) 
