@@ -6,14 +6,12 @@
     {% block body %}
             <div class="w-25 mx-auto main-div">
         <div class="container card px-0 pb-3 pt-2" style="padding:0px!important" >
-          {% include "flash.html" %}
           <div class="d-flex pb-2" style="box-shadow: 0px 2px 10px rgb(0 0 0 / 25%); z-index: 10; ">
                     <div class="d-flex align-items-center ms-3">
                       <a href="/"><i class="fa fa-arrow-left me-2" aria-hidden="true"></i></a>
                         <img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=35 height=35>
                     </div>
-                    <div class="ps-2 row w-100">
-                      <div class="col-7">
+                    <div class="ps-2 ">
                         <span class="fw-bold fs-4">
                             {{user.username}}
                         </span>
@@ -23,18 +21,18 @@
                                 Online
                               {% elif user.status == "secondary" %}
                                New User
+                               {% elif user.status == "deleted" %}
+                               Last Seen {{user.last_active}} 
                                {% else %}
                                Last Seen {{user.status}}
                               {% endif %}
                                 
                             </span>
-                          </div>
-                    <div class="col d-flex align-items-center">
-                      <button class="btn btn-sm btn-dark float-end del_msgs">Delete all</button>
-                    </div>
                     </div>
                 </div>
     <div id="container" style="overflow-y: auto; height:100%; background: #f8f8f8">
+          {% include "flash.html" %}
+
       {% if message|length == 0 %}
       <div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
                             <p class="text-center text-muted">
@@ -73,12 +71,12 @@
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
 
    <script type="text/javascript">
+    //custom functions to be called
     function resize_div() {
     $(".message").css({
         "max-width": `${$(".card").width()-100}px`
     })
     }
-
     function hideMenu(e) {
       
       if (e.target.classList[0] != "fa-angle-down"){
@@ -120,8 +118,8 @@
         e.preventDefault();
         if (cl.classList[1] == "right") {
           $(drop).html(`<li><button  class="delme dropdown-item">Delete for me</button></li><button class=" delev dropdown-item" >Delete For everyone</button></li>
-            <li><button  class="dropdown-item edit_chat">Edit Message</button>`)
-        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li>`)}
+            <li><button  class="dropdown-item edit_chat">Edit Message</button><li><button class="dropdown-item del_msgs">Delete all</button></li>`)
+        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li><li><button class="dropdown-item del_msgs">Delete all</button></li>`)}
         drop.style.display = "block"
         pos = position(e)
         drop.style.left = pos.x + "px"
@@ -136,18 +134,35 @@
       console.log(e)
       
         $(".delot").click(function(){
+          if (confirm("Do you really want to delete this?!")){
           socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+        }
         })
 
         $(".delme").click(function(){
+          if (confirm("Do you really want to delete this?!")){
+
           socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+        }
         })
         $(".delev").click(function(){
+          if (confirm("Do you really want to delete this?!")){
+
           socket.emit("change",{id:ids,type:"cur_d_all",user:"{{user.username}}",current_user:"{{current_user.username}}"})
+        }
         })
         $(".edit_chat").click(function(){
           alert("Coming Soon!!")
         })
+      $(".del_msgs").click(function() {
+          if (confirm("Do you really want to delete this?!")){
+            socket.emit("delete_all_msg", {
+                user: "{{user.username}}",
+                current_user: "{{current_user.username}}"
+            })
+          }
+        })
+    
         }
       else{
         
@@ -161,7 +176,13 @@
           
           return formatted_date
         }
-
+    function append_no_msg() {
+        $("#container").html(`<div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
+                            <p class="text-center text-muted">
+                                No messages available. Once You send they will appear here
+                            </p>
+                        </div>`)
+    }
     function write(msg, pos, date,id,user) {
         $("#container").append(`<div class="d-flex mt-3" style="float: ${pos}; clear: both; margin: 5px; ">
               ${pos=="left" ? 
@@ -179,6 +200,7 @@
         resize_div()
     }
 
+// socket events
 
     $(document).ready(function() {
         let date = document.querySelector("#status")
@@ -264,11 +286,8 @@
           }
         })
         socket.on("deleted_all", data => {
-          $("#container").html(`<div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
-                            <p class="text-center text-muted">
-                                No messages available. Once You send they will appear here
-                            </p>
-                        </div>`)
+          append_no_msg()
+
         })
 
         socket.on("msg", data => {
@@ -296,6 +315,7 @@
           $(`#${parseInt(data.id)+1}`).parent().remove()
         }
         }
+        if ($(".message").length == 0) append_no_msg()
         })
 
       socket.on("type", data => {

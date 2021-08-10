@@ -2,120 +2,122 @@
 {% block body %}
 <div class="w-25 mx-auto main-div" style="min-width:300px ">
     <div class="container card px-3 py-3 " style="padding:1rem!important">
-{% include "flash.html" %}
-<div class="row mb-3">
-    <div class="col">
-        <h3 class="mb-0">
-            <a class="text-dark float-start" href="/">
-                <i aria-hidden="true" class="fa fa-arrow-left me-2">
-                </i>
-            </a>
-        </h3>
-    </div>
-    <div class="col">
-        <div class="dropdown float-end">
-            <a aria-expanded="false" class="dropdown-toggle text-muted" data-bs-toggle="dropdown" href="#" id="dropdownMenuLink">
-                Hello {{current_user.username}}
-            </a>
-            <ul aria-labelledby="dropdownMenuLink" class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item change_email" href="/reset_email">
-                        Change Email Address
+        {% include "flash.html" %}
+        <div class="row mb-3">
+            <div class="col">
+                <h3 class="mb-0">
+                    <a class="text-dark float-start" href="/">
+                        <i aria-hidden="true" class="fa fa-arrow-left me-2">
+                        </i>
                     </a>
-                </li>
-                <li>
-                    <a class="dropdown-item update-info" href="/edit_profile">
-                        Update Account Info
+                </h3>
+            </div>
+            <div class="col">
+                <div class="dropdown float-end">
+                    <a aria-expanded="false" class="dropdown-toggle text-muted" data-bs-toggle="dropdown" href="#" id="dropdownMenuLink">
+                        Hello {{current_user.username}}
                     </a>
-                </li>
-            </ul>
+                    <ul aria-labelledby="dropdownMenuLink" class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item change_email" href="/reset_email">
+                                Change Email Address
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item update-info" href="/edit_profile">
+                                Update Account Info
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-<form action="" method="POST">
-    {{ form.csrf_token }}
-    <div class="row">
-        <div class="col">
-            <div class="form-group mt-2">
-                {{ form.email.label(class="form-control-label") }}
+        <form action="" method="POST">
+            {{ form.csrf_token }}
+            <div class="row">
+                <div class="col">
+                    <div class="form-group mt-2">
+                        {{ form.email.label(class="form-control-label") }}
                     {% if form.email.errors %}
                         {{ form.email(class="form-control form-control-lg is-invalid email") }}
-                <div class="invalid-feedback">
-                    {% for error in form.email.errors %}
-                    <span>
-                        {{ error }}
-                    </span>
-                    {% endfor %}
-                </div>
-                {% else %}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                            <span>
+                                {{ error }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
                         {{ form.email(class="form-control email") }}
                     {% endif %}
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group mt-2">
-                {{ form.confirm_email.label(class="form-control-label") }}
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mt-2">
+                        {{ form.confirm_email.label(class="form-control-label") }}
                     {% if form.confirm_email.errors %}
                         {{ form.confirm_email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_email.errors %}
+                            <span>
+                                {{ error }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.confirm_email(class="form-control") }}
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                {{ form.password.label(class="form-control-label") }}
+                    {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
-                    {% for error in form.confirm_email.errors %}
+                    {% for error in form.password.errors %}
                     <span>
                         {{ error }}
                     </span>
                     {% endfor %}
                 </div>
                 {% else %}
-                        {{ form.confirm_email(class="form-control") }}
-                    {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="form-group mt-2">
-        {{ form.password.label(class="form-control-label") }}
-                    {% if form.password.errors %}
-                        {{ form.password(class="form-control form-control-lg is-invalid") }}
-        <div class="invalid-feedback">
-            {% for error in form.password.errors %}
-            <span>
-                {{ error }}
-            </span>
-            {% endfor %}
-        </div>
-        {% else %}
                         {{ form.password(class="form-control") }}
                     {% endif %}
-    </div>
-    <div class="d-flex otp-div text-center mt-3 justify-content-center align-items-center">
-        <button class="btn btn-dark btn-sm mx-2 otp"  type="button">
-            Send OTP
-        </button>
-        <label class="text-danger mx-2 label-otp">
-        </label>
-    </div>
-    <div class="otp-countdown text-dark text-center d-none">
-    The OTP will expire in <span id="expire_time"></span>
-</div>
-    <div class="form-group mt-2">
-        {{ form.email_otp.label(class="form-control-label") }}
+            </div>
+            <div class="d-flex otp-div text-center mt-3 justify-content-center align-items-center">
+                <button class="btn btn-dark btn-sm mx-2 otp" type="button">
+                    Send OTP
+                </button>
+                <label class="text-danger mx-2 label-otp">
+                </label>
+            </div>
+            <div class="otp-countdown text-dark text-center d-none">
+                The OTP will expire in
+                <span id="expire_time">
+                </span>
+            </div>
+            <div class="form-group mt-2">
+                {{ form.email_otp.label(class="form-control-label") }}
                     {% if form.email_otp.errors %}
                         {{ form.email_otp(class="form-control form-control-lg is-invalid") }}
-        <div class="invalid-feedback">
-            {% for error in form.email_otp.errors %}
-            <span>
-                {{ error }}
-            </span>
-            {% endfor %}
-        </div>
-        {% else %}
+                <div class="invalid-feedback">
+                    {% for error in form.email_otp.errors %}
+                    <span>
+                        {{ error }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
                         {{ form.email_otp(class="form-control") }}
                     {% endif %}
+            </div>
+            <div class="d-grid gap-2 mt-2">
+                {{ form.submit(class="btn btn-primary text-center")}}
+            </div>
+        </form>
     </div>
-    <div class="d-grid gap-2 mt-2">
-        {{ form.submit(class="btn btn-primary text-center")}}
-    </div>
-</form>
 </div>
-</div>
-    <script charset="utf-8" src="{{url_for('static',filename='js/otp.js')}}" type="text/javascript">
-    </script>
+<script charset="utf-8" src="{{url_for('static',filename='js/otp.js')}}" type="text/javascript">
+</script>
 {% endblock %}

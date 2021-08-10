@@ -12,8 +12,6 @@ from app.firebase import storage,firebase_user
 
 users = Blueprint('users', __name__)
 
-
-
 @users.route("/register",methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
@@ -168,7 +166,7 @@ def delete_account():
             msgs = Message.query.filter_by(username=current_user.username).delete()
             User.password = "mxmxmxmxmx"
             User.email = ""
-            User.status = "deleted"
+            User.status = "deleted" 
             User.email_confirmed = False
             if User.pic != "default.jpg":
                 storage.delete(current_user.pic,firebase_user["idToken"])

@@ -75,7 +75,7 @@ def test_disconnect():
 @authenticated_only
 def typing(data):
     print(data)
-    if not current_user.is_anonymous:
+    if not current_user.is_anonymous and not userDeleted(data["user"]):
         for i in list(sids):
             if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
                 emit("type",{"typing":data["typing"],"user":current_user.username},room=i)
@@ -119,7 +119,8 @@ def handle_message(data):
 @socketio.on('message')
 @authenticated_only
 def handle_message(data):
-    if not current_user.is_anonymous:
+    print(userDeleted(data["user"]))
+    if not current_user.is_anonymous  and not userDeleted(data["user"]):
         rec_user = Detail.query.filter_by(username=data["user"]).first()
         msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.utcnow())
         msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
