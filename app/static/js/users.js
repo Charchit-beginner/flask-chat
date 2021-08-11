@@ -27,18 +27,10 @@ $(document).ready(function() {
         }
     })
                 socket.on("disconnect", (reason) => {
-         $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
-           You have disconnected from the server. Reconnecting...
-    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
-    </button>
-</div>`)
+            dis("You have disconnected from the server. Reconnecting...")
         });
         socket.io.on("reconnect", () => {
-           $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
-    You have successfully reconnected to server.
-    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
-    </button>
-</div>`)
+            dis("You have successfully reconnected to server.")
           });
     
     unseen = document.querySelectorAll(".unseen")
@@ -145,4 +137,14 @@ var search = () => {
     } else {
         $(".nouser").remove()
     }
+}
+
+// funtions 
+function dis(msg){
+    $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
+    ${msg}
+    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
+    </button>
+</div>`)
+           setTimeout(function() {$(".show").hide()}, 2000);
 }

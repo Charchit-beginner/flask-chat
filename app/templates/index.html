@@ -207,7 +207,14 @@
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()
     }
-
+function dis(msg){
+    $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
+    ${msg}
+    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
+    </button>
+</div>`)
+           setTimeout(function() {$(".show").hide()}, 2000);
+}
 
 
 
@@ -302,21 +309,12 @@
       // socket listening events
 
 
-            socket.on("disconnect", (reason) => {
-          $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
-   You have disconnected from the server. Reconnecting...
-    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
-    </button>
-</div>`)
+                socket.on("disconnect", (reason) => {
+            dis("You have disconnected from the server. Reconnecting...")
         });
         socket.io.on("reconnect", () => {
-           $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
-    You have successfully reconnected to server.
-    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
-    </button>
-</div>`)
+            dis("You have successfully reconnected to server.")
           });
-
         socket.on("status", data => {
 
           if (data.user != "{{current_user.username}}" && data.user == document.location.pathname.slice(6)){

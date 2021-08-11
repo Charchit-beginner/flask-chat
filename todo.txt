@@ -88,16 +88,19 @@ $(".edit_chat").click(function(){
   1. - add checks - done
   2. - checked for html mismatch tags - done 
   3. - add checks for sending limit message - done
-  4. fixed socket update on register pic user.
+  4. - fix socket update on register pic user. - done
+  5. - some finishes
+
 2. restrict user to send message after delete - done
 17. update title on msg- done
 18. reconnect and connect event - done
 5. update when user deletes account - done
 3. make hash passwords. -done
+19. add recapcha  - done but not adding
 
-19. add recapcha
-4. make readme better
-
+14. make readme better
+15. final - check everything and deploy to heroku
+16. use flask-talisman
 // later ideas 
 1. make friends ,remove friends
 2. edit message
