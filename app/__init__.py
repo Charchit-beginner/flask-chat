@@ -5,6 +5,7 @@ from flask_socketio import SocketIO
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 db = SQLAlchemy()
@@ -12,6 +13,7 @@ migrate = Migrate()
 socketio = SocketIO()
 login_manager = LoginManager() 
 mail = Mail()
+bcrypt = Bcrypt()
 login_manager.login_view = 'users.signin'
 login_manager.login_message = "Login To Continue"
 login_manager.login_message_category = 'info'
@@ -23,6 +25,7 @@ def create_app(config_class = Config):
 	login_manager.init_app(app)
 	migrate.init_app(app, db)
 	mail.init_app(app)
+	bcrypt.init_app(app)
 
 	from app.users.routes import users
 	from app.main.routes import main

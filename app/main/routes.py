@@ -121,19 +121,22 @@ def handle_message(data):
 def handle_message(data):
     print(userDeleted(data["user"]))
     if not current_user.is_anonymous  and not userDeleted(data["user"]):
-        rec_user = Detail.query.filter_by(username=data["user"]).first()
-        msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.utcnow())
-        msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
-        db.session.add(msg)
-        db.session.add(msg1)
-        db.session.flush()
-        for i in list(sids):
+        if len(data["msg"]) < 2000:
+            rec_user = Detail.query.filter_by(username=data["user"]).first()
+            msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.utcnow())
+            msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
+            db.session.add(msg)
+            db.session.add(msg1)
+            db.session.flush()
+            for i in list(sids):
 
-            if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
-                print(data)
-                emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
-        db.session.commit()
-        return "done!"
+                if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
+                    print(data)
+                    emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
+            db.session.commit()
+            return "done!"
+        else:
+            emit("error_msg",{"error":"Limit of sending 2000 characters message exceeded"})
 
 
  # users = {charchit:sfsfs,charhit1:sefegr}

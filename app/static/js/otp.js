@@ -12,7 +12,7 @@
                 if (data.user == false) {
                     $(".label-otp").text(data.error)
                 } else {
-                    $(".label-otp").attr("class", "text-success mx-2 label-otp")
+                    $(".label-otp").attr("class", " text-center text-success mx-2 label-otp")
                     $(".label-otp").text(data)
                     count()
                 }

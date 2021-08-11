@@ -1,7 +1,7 @@
 from  flask import Flask,Blueprint,render_template,session,request,redirect,flash,url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import login_user, current_user, logout_user, login_required
-from app import socketio,db
+from app import socketio,db,bcrypt
 from flask_socketio import emit, send
 from app.users.forms import RegistrationForm,LoginForm,Account,ChangeEmail,Confirm_email,ResetPassword
 from app.models import *
@@ -19,7 +19,8 @@ def register():
         return redirect("/")
     form = RegistrationForm()
     if request.method=="POST" and form.validate_on_submit():
-        user = Detail(username=form.username.data,email=form.email.data,password=form.password.data)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = Detail(username=form.username.data,email=form.email.data,password=hashed_password)
         db.session.add(user)
         db.session.commit()
         socketio.emit('regis' ,user.username,broadcast=True)
@@ -48,9 +49,9 @@ def signin():
         return redirect("/")
     form = LoginForm()
     if request.method=="POST" and form.validate_on_submit():
-        user = Detail.query.filter_by(username=form.username.data,password=form.password.data).first()
+        user = Detail.query.filter_by(username=form.username.data).first()
         print(user)
-        if user:
+        if user != None and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             flash("Logined successfully","success")
         else:
@@ -81,7 +82,8 @@ def edit():
             if form.pic.data:
                 picture_file = save_picture(form.pic.data)
                 current_user.pic = picture_file
-            current_user.password = form.New_password.data if form.New_password.data != "" else current_user.password
+
+            current_user.password = bcrypt.generate_password_hash(form.New_password.data).decode('utf-8') if form.New_password.data != "" else current_user.password
             current_user.time = datetime(1000, 1, 1, 1, 1, 1) 
             current_user.otp = ""
             db.session.commit()
@@ -117,7 +119,8 @@ def password():
     if request.method == "POST" and form.validate_on_submit():
         user =  Detail.query.filter_by(username=form.username.data).first()
         if user:
-            user.password = form.password.data
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            user.password = hashed_password
             user.time = datetime(1000, 1, 1, 1, 1, 1) 
             user.otp = ""
             db.session.commit()
@@ -136,8 +139,8 @@ def otp():
             if User:
                 cur_user = User
             else:
-                return {"user":False,"error":"No User exists wiht that username"}
-        cur_user.otp =  randint(23145,91875)
+                return {"user":False,"error":"No User exists with that username"}
+        cur_user.otp =  randint(12121,99299)
         cur_user.otp_timing = datetime.utcnow()
         db.session.commit()
         if email :
@@ -171,8 +174,10 @@ def delete_account():
             if User.pic != "default.jpg":
                 storage.delete(current_user.pic,firebase_user["idToken"])
             User.pic = "default.jpg"
+            User.otp = ""
             db.session.commit()
             flash("Account deleted successfully!","success")
+            socketio.emit('account_delete' ,current_user.username,broadcast=True)
             logout_user()
             return "deleted"
 

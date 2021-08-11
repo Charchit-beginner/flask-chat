@@ -7,7 +7,12 @@ $(document).ready(function() {
         let hasNumber = /\d/;
         if (data.rec_user == current_user.value) {
             $(`a[href="/chat/${data.user}"]`).find("span.span").text(data.msg)
-            console.log(unseen_msg_no.innerText == "", "Fsfs")
+            if (!hasNumber.test($("title")[0].innerText)){
+                $("title").text("(1) ChatApp")
+            }
+            else{
+                $("title").text(`(${parseInt($("title")[0].innerText.slice(1,2)) + 1}) ChatApp`)   
+            }
             if (!hasNumber.test(unseen_msg_no.innerText)) {
                 console.log("hi")
                 unseen_msg_no.innerText = "1"
@@ -21,6 +26,21 @@ $(document).ready(function() {
             $(`a[href="/chat/${data.rec_user}"]`).find("span.span").text(`You: ${data.msg}`)
         }
     })
+                socket.on("disconnect", (reason) => {
+         $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
+           You have disconnected from the server. Reconnecting...
+    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
+    </button>
+</div>`)
+        });
+        socket.io.on("reconnect", () => {
+           $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
+    You have successfully reconnected to server.
+    <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button">
+    </button>
+</div>`)
+          });
+    
     unseen = document.querySelectorAll(".unseen")
     unseen.forEach(e => {
         console.log(e.innerText == "")
@@ -35,7 +55,7 @@ $(document).ready(function() {
         $(".empty").remove()
         $(".user").append(`<a href="/chat/${data}">
                         <div class="align-items-center d-flex hover py-2">
-                            <img class="rounded-circle border border-dark" height="40" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn3.iconfinder.com%2Fdata%2Ficons%2Fpopular-services-brands-vol-2%2F512%2Fstackoverflow-512.png&f=1&nofb=1" width="40">
+                            <img class="rounded-circle border border-dark" height="40" src="/static/images/default.jpg" width="40">
                             
                             <div class="ps-2" style="white-space: nowrap;">
                                 <span class="fw-bold text-dark fs-5 main-data">
@@ -67,6 +87,8 @@ $(document).ready(function() {
             $(`.${data.user}`).attr("class", `status fa fa-circle text-secondary ${data.user}`)
         }
     })
+
+
     //  typing
     arr = new Set()
     socket.on("type", data => {

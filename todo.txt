@@ -76,18 +76,27 @@ $(".edit_chat").click(function(){
 12. add 404 page and 500 page - done
 13. use abort for unknown users - done
 16. make code expire - done
+
+// done now
 11. make env file - done
 15. make gitignore- done
 8. update unseen message on users page - done
 14. try using different js files. - done but not as I wanted
+
+// done -  11- 08
 10. finishing up 
   1. - add checks - done
   2. - checked for html mismatch tags - done 
-2. restrict user to send message after delete - pretty much done, frontend left
+  3. - add checks for sending limit message - done
+  4. fixed socket update on register pic user.
+2. restrict user to send message after delete - done
+17. update title on msg- done
+18. reconnect and connect event - done
+5. update when user deletes account - done
+3. make hash passwords. -done
 
-3. make hash passwords and otps.
+19. add recapcha
 4. make readme better
-5. update when user deletes account
 
 // later ideas 
 1. make friends ,remove friends

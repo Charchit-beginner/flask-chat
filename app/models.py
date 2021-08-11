@@ -13,7 +13,7 @@ class Detail(db.Model,UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(35),unique=True, nullable=False)
     email = db.Column(db.String(35),  nullable=False)
-    password = db.Column(db.String(15), nullable=False)
+    password = db.Column(db.String(300), nullable=False)
     status = db.Column(db.String(10),default="secondary")
     pic = db.Column(db.String(51),default="default.jpg")
     last_active = db.Column(db.DateTime,default=datetime.now())
@@ -26,7 +26,7 @@ class Detail(db.Model,UserMixin):
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    msg = db.Column(db.String(1000))
+    msg = db.Column(db.String(2000))
     msg_type =  db.Column(db.String(5))
     username = db.Column(db.String(20),db.ForeignKey("detail.username"))
     get_user = db.Column(db.String(20))

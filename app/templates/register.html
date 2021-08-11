@@ -75,6 +75,14 @@
             </div>
         </form>
         {% else %}
+         <div class="col">
+        <h3 class="mb-0">
+            <a class="text-dark float-start" href="/">
+                <i aria-hidden="true" class="fa fa-arrow-left me-2">
+                </i>
+            </a>
+        </h3>
+    </div>
         <h3 class="text-center">
             Confirm Email
         </h3>
@@ -103,8 +111,14 @@
         <label class=" text-center text-danger my-1 label-otp">
         </label>
     </div>
+                <div class="otp-countdown text-dark text-center d-none">
+                The OTP will expire in
+                <span id="expire_time">
+                </span>
+            </div>
                         <div class="d-grid gap-2 mt-2">
                 {{ form.submit(class="btn btn-primary text-center")}}
+                <p>Want to change Email?<a class="ms-1" href="/reset_email">Reset Email</a></p>
             </div>    
         </form>
             <script charset="utf-8" src="{{url_for('static',filename='js/otp.js')}}" type="text/javascript">
@@ -114,13 +128,4 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    $(document).ready(function(){
-    socket = io.connect(document.href);
-    $("#submit").click(function(){    
-        socket.emit("register",$(".username").val())
-    })
-
-})
-</script>
 {% endblock %}
