@@ -2,6 +2,10 @@
 app/firebase_config.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
+app/__pycache__/
+app/errors/__pycache__/
+app/main/__pycache__/
+app/users/__pycache__/
 *.py[cod]
 *$py.class
 

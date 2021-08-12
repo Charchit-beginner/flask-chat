@@ -3,10 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print(os.getenv("RECAPTCHA_PUBLIC_KEY"))
 class Config:
 	SECRET_KEY = os.getenv('SECRET_KEY')
-	SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"
+	SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	DEBUG = True
 	MAIL_SERVER = "smtp.gmail.com"

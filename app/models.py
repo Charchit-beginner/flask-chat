@@ -14,7 +14,7 @@ class Detail(db.Model,UserMixin):
     username = db.Column(db.String(35),unique=True, nullable=False)
     email = db.Column(db.String(35),  nullable=False)
     password = db.Column(db.String(300), nullable=False)
-    status = db.Column(db.String(10),default="secondary")
+    status = db.Column(db.String(21),default="secondary")
     pic = db.Column(db.String(51),default="default.jpg")
     last_active = db.Column(db.DateTime,default=datetime.now())
     otp_timing = db.Column(db.DateTime)
@@ -27,9 +27,9 @@ class Detail(db.Model,UserMixin):
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     msg = db.Column(db.String(2000))
-    msg_type =  db.Column(db.String(5))
-    username = db.Column(db.String(20),db.ForeignKey("detail.username"))
-    get_user = db.Column(db.String(20))
+    msg_type =  db.Column(db.String(6))
+    username = db.Column(db.String(35),db.ForeignKey("detail.username"))
+    get_user = db.Column(db.String(35))
     time = db.Column(db.DateTime)
 
 
