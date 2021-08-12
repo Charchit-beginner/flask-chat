@@ -18,11 +18,10 @@ class Detail(db.Model,UserMixin):
     pic = db.Column(db.String(51),default="default.jpg")
     last_active = db.Column(db.DateTime,default=datetime.now())
     otp_timing = db.Column(db.DateTime)
-    otp =  db.Column(db.Integer,nullable=True)
+    otp =  db.Column(db.String(7),nullable=True)
     email_confirmed =  db.Column(db.Boolean, nullable=False, default=False)
     user_message1 = db.relationship("Message", backref="owner",cascade="all, delete, delete-orphan")
     # def __init__()
-
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)

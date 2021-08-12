@@ -140,7 +140,7 @@ def otp():
                 cur_user = User
             else:
                 return {"user":False,"error":"No User exists with that username"}
-        cur_user.otp =  randint(12121,99299)
+        cur_user.otp =  str(randint(121211,999299))
         cur_user.otp_timing = datetime.utcnow()
         db.session.commit()
         if email :
