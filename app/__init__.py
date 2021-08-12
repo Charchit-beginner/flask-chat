@@ -6,7 +6,6 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
-from flask_talisman import Talisman
 
 app = Flask(__name__)
 db = SQLAlchemy()
@@ -15,7 +14,6 @@ socketio = SocketIO()
 login_manager = LoginManager() 
 mail = Mail()
 bcrypt = Bcrypt()
-talisman = Talisman()
 login_manager.login_view = 'users.signin'
 login_manager.login_message = "Login To Continue"
 login_manager.login_message_category = 'info'
@@ -28,8 +26,7 @@ def create_app(config_class = Config):
 	migrate.init_app(app, db)
 	mail.init_app(app)
 	bcrypt.init_app(app)
-	talisman.init_app(app)
-	
+
 	from app.users.routes import users
 	from app.main.routes import main
 	from app.errors.error import errors
