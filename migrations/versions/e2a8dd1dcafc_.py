@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 7ac3019af1d8
+Revision ID: e2a8dd1dcafc
 Revises: 
-Create Date: 2021-08-03 12:04:49.920108
+Create Date: 2021-08-12 14:32:33.000780
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7ac3019af1d8'
+revision = 'e2a8dd1dcafc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,20 +22,23 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=35), nullable=False),
     sa.Column('email', sa.String(length=35), nullable=False),
-    sa.Column('password', sa.String(length=15), nullable=False),
-    sa.Column('date', sa.String(length=15), nullable=True),
-    sa.Column('status', sa.String(length=10), nullable=True),
-    sa.Column('tagline', sa.String(length=10), nullable=True),
+    sa.Column('password', sa.String(length=300), nullable=False),
+    sa.Column('status', sa.String(length=21), nullable=True),
+    sa.Column('pic', sa.String(length=51), nullable=True),
+    sa.Column('last_active', sa.DateTime(), nullable=True),
+    sa.Column('otp_timing', sa.DateTime(), nullable=True),
+    sa.Column('otp', sa.Integer(), nullable=True),
+    sa.Column('email_confirmed', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
     op.create_table('message',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('msg', sa.String(length=1000), nullable=True),
-    sa.Column('msg_type', sa.String(length=5), nullable=True),
-    sa.Column('username', sa.String(length=20), nullable=True),
-    sa.Column('get_user', sa.String(length=20), nullable=True),
-    sa.Column('time', sa.String(length=12), nullable=True),
+    sa.Column('msg', sa.String(length=2000), nullable=True),
+    sa.Column('msg_type', sa.String(length=6), nullable=True),
+    sa.Column('username', sa.String(length=35), nullable=True),
+    sa.Column('get_user', sa.String(length=35), nullable=True),
+    sa.Column('time', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['username'], ['detail.username'], ),
     sa.PrimaryKeyConstraint('id')
     )
