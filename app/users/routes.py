@@ -155,7 +155,7 @@ def delete_account():
     if request.method == "POST":
         print("hieall ")
         print(request.form.get("otp"))
-        if request.form.get("otp") != str(current_user.otp) or  (datetime.utcnow() - current_user.otp_timing).seconds / 60 > 1:
+        if str(request.form.get("otp")) != str(current_user.otp) or  (datetime.utcnow() - current_user.otp_timing).seconds / 60 > 1:
             print(request.form.get("otp"))
             if (datetime.utcnow() - current_user.otp_timing).seconds / 60 > 5:
                 print("sfs")

@@ -20,7 +20,7 @@ def validate_password(form,password):
         raise ValidationError('password incorrect')
 
 def validate_otp(form,otp):
-    if otp.data != current_user.otp or  (datetime.utcnow() - current_user.otp_timing).seconds / 60 > 5:
+    if str(otp.data) != str(current_user.otp) or  (datetime.utcnow() - current_user.otp_timing).seconds / 60 > 5:
         if (datetime.utcnow() - current_user.otp_timing).seconds / 60 > 1:
             current_user.otp = ""
             current_user.otp_timing = datetime(1000, 1, 1, 1, 1, 1)
@@ -117,7 +117,7 @@ class ResetPassword(FlaskForm):
 
     def check_otp(self,otp,username):
         User =  Detail.query.filter_by(username=username.data).first()
-        if otp.data != User.otp or  (datetime.utcnow() - User.otp_timing).seconds / 60 > 5:
+        if str(otp.data) != str(User.otp) or  (datetime.utcnow() - User.otp_timing).seconds / 60 > 5:
             if (datetime.utcnow() - User.otp_timing).seconds / 60 > 1:
                 User.otp = ""
                 User.otp_timing = datetime(1000, 1, 1, 1, 1, 1)
