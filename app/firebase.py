@@ -6,13 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CONFIG = {
-	"apiKey": "AIzaSyCax55fwQtaQnETvZbPqyQ4pJ5AferWO6s",
-	"authDomain": "flask-chat-app-dc088.firebaseapp.com",
-	"projectId": "flask-chat-app-dc088",
-	"storageBucket": "flask-chat-app-dc088.appspot.com",
-	"messagingSenderId": "434955273588",
-	"appId": "1:434955273588:web:eafccf07b7a23743b4d821",
-	"measurementId": "G-R17KS0MB9N",
+	"apiKey": os.getenv("API_KEY"),
+	"authDomain": os.getenv("AUTH_DOMAIN"),
+	"projectId":os.getenv("PROJECT_ID"),
+	"storageBucket": os.getenv("STORAGE_BUCKET"),
+	"messagingSenderId": os.getenv("MESSAGE_SENDER_ID"),
+	"appId": os.getenv("APP_ID"),
+	"measurementId": os.getenv("MEASUREMENT_ID"),
 	"databaseURL":"no"
 }
 
