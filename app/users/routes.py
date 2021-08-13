@@ -167,7 +167,7 @@ def delete_account():
         else:
             User = Detail.query.filter_by(username=current_user.username).first()
             msgs = Message.query.filter_by(username=current_user.username).delete()
-            User.password = "mxmxmxmxmx"
+            User.password = bcrypt.generate_password_hash("mx234jw39g2").decode('utf-8')
             User.email = ""
             User.status = "deleted" 
             User.email_confirmed = False
