@@ -32,9 +32,7 @@ main = Blueprint('main', __name__)
 @socketio.on('connect')
 def test_connect(auth):
     if not current_user.is_anonymous:
-        print(sids)
         sids[request.sid] = current_user.username
-        print(sids)
         emit('status', {'user': current_user.username,"status":"Online"},broadcast=True)
         current_user.status = "Online"
         db.session.commit()
@@ -43,18 +41,14 @@ def test_connect(auth):
 def get_id(data):
     if not current_user.is_anonymous:
         sids[request.sid] =  current_user.username + "user_contact"
-    print(sids)
 
 @socketio.on('disconnect')
 def test_disconnect():
-    print(request.namespace,request)
     if not current_user.is_anonymous:
         cur_sid = sids[request.sid]
         del sids[request.sid]
-        print("noooooo")
         if not cur_sid.endswith("user_contact") and not cur_sid in [i for  i in sids.values()]:
             current_user.last_active =  datetime.utcnow()
-            print("user relay")
             db.session.commit()
 
         if not cur_sid in [i for i in sids.values()] or (not cur_sid in [i for i in sids.values()] and cur_sid.endswith("user_contact")) :
@@ -74,7 +68,6 @@ def test_disconnect():
 @socketio.on('typing')
 @authenticated_only
 def typing(data):
-    print(data)
     if not current_user.is_anonymous and not userDeleted(data["user"]):
         for i in list(sids):
             if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
@@ -86,7 +79,6 @@ def typing(data):
 @socketio.on('change')
 @authenticated_only
 def handle_change(data):
-    print(data, data["type"] == "cur_d_all")
     if not current_user.is_anonymous:
         if current_user.username == data["current_user"]:
             for i in list(sids):
@@ -119,7 +111,6 @@ def handle_message(data):
 @socketio.on('message')
 @authenticated_only
 def handle_message(data):
-    print(userDeleted(data["user"]))
     if not current_user.is_anonymous  and not userDeleted(data["user"]):
         if len(data["msg"]) < 2000:
             rec_user = Detail.query.filter_by(username=data["user"]).first()

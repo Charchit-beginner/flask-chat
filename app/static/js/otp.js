@@ -1,5 +1,4 @@
     $(".otp").click(() => {
-        console.log("hi")
         $.ajax({
             type: "POST",
             url: "/otp",
@@ -8,7 +7,6 @@
                 username: $("#username").val()
             },
             success: function(data) {
-                console.log(data)
                 if (data.user == false) {
                     $(".label-otp").text(data.error)
                 } else {
@@ -19,7 +17,6 @@
             },
             error: function(req, err, errth) {
                 if (err) {
-                    console.log(req, err, errth)
                     $(".card").prepend(`<div class="alert alert-warning alert-dismissible" role="alert" >
                     An error occured while sending otp. Please try again!!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -37,7 +34,6 @@
         var count = new Date("Jan 5, 2022 15:50:25").getTime();
         var countDownDate = new Date("Jan 5, 2022 15:45:25").getTime();
         var x = setInterval(function() {
-            console.log(count, countDownDate)
             countDownDate += 1000
             var distance = count - countDownDate
             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));

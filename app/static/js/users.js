@@ -1,4 +1,35 @@
 $(document).ready(function() {
+    const audio = new Audio("/static/audio/notification.mp3")
+
+    function vol(muted){
+        if (muted){
+        audio.muted = true
+        $(".fa-volume-up").addClass("d-none")
+        $(".fa-volume-mute").removeClass("d-none")
+    }else{
+        audio.muted = false
+        $(".fa-volume-mute").addClass("d-none")
+        $(".fa-volume-up").removeClass("d-none")
+}
+
+    }
+    $(".fa-volume-up").click((e)=>{
+        document.cookie = "muted=true"
+        vol(true)
+    })
+    $(".fa-volume-mute").click((e)=>{
+        document.cookie = "muted=false"
+        vol(false)
+    })
+    if (document.cookie == "muted=true"){
+        vol(true)
+    }
+    else{
+        vol(false)
+    }
+
+
+
     socket = io.connect(document.href);
     // last message shower
     socket.on("msg", data => {
@@ -7,6 +38,7 @@ $(document).ready(function() {
         let hasNumber = /\d/;
         if (data.rec_user == current_user.value) {
             $(`a[href="/chat/${data.user}"]`).find("span.span").text(data.msg)
+                audio.play()
             if (!hasNumber.test($("title")[0].innerText)){
                 $("title").text("(1) ChatApp")
             }

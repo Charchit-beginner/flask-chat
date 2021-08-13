@@ -223,6 +223,15 @@ function dis(msg){
 
 
     $(document).ready(function() {
+        const audio = new Audio("{{url_for('static',filename='audio/notification.mp3')}}")
+        if (document.cookie == "muted=true"){
+          audio.muted = true
+        }
+        else{
+          audio.muted = false
+        }
+        const hasNumber = /\d/;
+        var timeout
         let date = document.querySelector("#status")
         if (date.innerText != "New User" && date.innerText != "Online") date.innerText = "Last Seen " +format_date(date.innerText)
         msg_date = document.querySelectorAll(".times")
@@ -259,7 +268,16 @@ function dis(msg){
                 behavior: "smooth"
             })
         })
-        var timeout
+        $(document).on("visibilitychange",()=>{
+            if (document.visibilityState === "hidden") {
+                
+              } else  {
+                setTimeout(function() {$("title").text("ChatApp")}, 2000);
+                
+              }
+        })
+
+
         socket = io.connect(document.href);
         socket.on('connect', function() {});
 
@@ -332,7 +350,7 @@ function dis(msg){
           }
         })
         socket.on("msg", data => {
-        let hasNumber = /\d/;
+        
 
             $(".empty").remove()
             if (data.status != "secondary"){
@@ -346,10 +364,16 @@ function dis(msg){
             } else if (data.user == document.location.pathname.slice(6)) {
                 write(data.msg, "left", data.date,data.id,data.user)
                 if (!hasNumber.test($("title")[0].innerText)){
+                  if (document.hidden){
                 $("title").text("(1) ChatApp")
+                audio.play()
+              }
             }
                 else{
+                  if (document.hidden){
+                audio.play()
                 $("title").text(`(${parseInt($("title")[0].innerText.slice(1,2)) + 1}) ChatApp`)   
+              }
             }
             }
         })

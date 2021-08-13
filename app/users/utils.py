@@ -7,7 +7,7 @@ from flask import  flash
 from app.firebase import storage,firebase_user,firebase
 
 def send_mail(otp=None,email=None):
-   	mail.send_message("OTP for login into herokuaoo.com",
+   	mail.send_message("OTP for login into Chatapp",
                 sender="charchit.dahiya@gmail.com",
                 recipients=[email],
                 body =  "Please use this otp for login in to your account\n" + str(otp)

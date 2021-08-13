@@ -22,7 +22,7 @@
                                 <span>
                                     Active
                                 </span>
-                           
+                           <i class="fas fa-volume-up ms-1"></i><i class="fas fa-volume-mute ms-1 d-none"></i>
                         </div>
                     </div>
                     <div class="col">
@@ -107,7 +107,8 @@
         </div>
     </div>
     <input type="hidden" id="current_user" value="{{current_user.username}}">
-
-        <script src="{{url_for('static',filename='js/users.js')}}" type="text/javascript" charset="utf-8" ></script>
     {% endblock %}
 </link>
+    {% block script %}
+        <script src="{{url_for('static',filename='js/users.js')}}" type="text/javascript" charset="utf-8" ></script>
+    {% endblock %}

@@ -3,7 +3,10 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
-.search:hover {
+.search{
+    cursor: pointer;
+}
+.fas{
     cursor: pointer;
 }
 .status {

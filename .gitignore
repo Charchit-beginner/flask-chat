@@ -1,5 +1,6 @@
 .env
 app/firebase_config.py
+app/test.db
 # Byte-compiled / optimized / DLL files
 __pycache__/
 app/__pycache__/
