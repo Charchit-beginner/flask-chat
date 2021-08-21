@@ -164,5 +164,5 @@ def chat(user):
     User = Detail.query.filter(Detail.username==user,Detail.username!=current_user.username).first()
     if not User:
         abort(404)
-    message = Message.query.filter_by(username=current_user.username,get_user=User.username).all()
+    message = Message.query.filter_by(username=current_user.username,get_user=User.username).order_by(Message.time).all()
     return render_template("index.html",user=User,message=message) 
