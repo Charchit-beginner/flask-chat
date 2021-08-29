@@ -100,9 +100,16 @@ $(".edit_chat").click(function(){
 
 14. make readme better
 15. final - check everything and deploy to heroku
-16. use flask-talisman
-// later ideas 
+16. use flask-talisman - undone
+20. fix url name errors - done
+21 - fixing update issues - done
+23 - change status to idle when user not on page - done
+24 - change status to editing profile when on profile - done
+22 - update page on reconnect
 1. make friends ,remove friends
+
+
+// later ideas 
 2. edit message
 3. seen unseen , better updating
 4. reply message
@@ -110,4 +117,5 @@ $(".edit_chat").click(function(){
 6. select messages
 7. make context menus and dropdowns animated - not done
 8. dark mode
-
+9. notification
+10. bring messages after scrolling

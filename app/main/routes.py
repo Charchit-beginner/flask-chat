@@ -74,7 +74,14 @@ def typing(data):
                 emit("type",{"typing":data["typing"],"user":current_user.username},room=i)
                     
 
+@socketio.on('idle')
+@authenticated_only
+def idle(data):
+    if not current_user.is_anonymous and current_user.status[0:4] != "Last":
+        emit("user_idle",{"stat":data["status"],"username":current_user.username},broadcast=True)
 
+        current_user.status = "Idle" if data["status"] == "Idle" else "Online"
+        db.session.commit()
 
 @socketio.on('change')
 @authenticated_only

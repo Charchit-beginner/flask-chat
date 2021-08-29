@@ -103,20 +103,52 @@ $(document).ready(function() {
         a = document.createTextNode(data)
         $(".main-data").last().append(a)
     })
+    
     //  status shower
     socket.on("status", data => {
+        console.log(data)
         if (data.status == "Online") {
-            $(`.${data.user}`).attr("class", `status fa fa-circle text-success ${data.user}`)
+            $(`a[href="/chat/${data.user}"]`).find("i.status").attr("class", `status fa fa-circle text-success`)
         } else {
-            $(`.${data.user}`).attr("class", `status fa fa-circle text-secondary ${data.user}`)
+            $(`a[href="/chat/${data.user}"]`).find("i.status").attr("class", `status fa fa-circle text-secondary`)
         }
     })
+    // update on change
+    socket.on("username_changed",data =>{
+        console.log(data)
+          $(`a[href="/chat/${data.old}"]`).find("span.names").text(data.new)
+          $(`a[href="/chat/${data.old}"]`).attr("href",`/chat/${data.new}`)
+        })
+    // user page change event
+    $(document).on("visibilitychange",()=>{
+            if (document.visibilityState == "hidden") {
+                  socket.emit("idle",{status:"Idle"})
+              } else  {
+                setTimeout(function() {$("title").text("ChatApp")}, 2000);
+                  socket.emit("idle",{status:"Online"})
+                  
+              }
+        })
 
+    // idle 
+    socket.on("user_idle",data =>{
+        console.log(data)
+        if(data.stat == "Idle") {
+            $(`a[href="/chat/${data.username}"]`).find("i.status").attr("class", `status fa fa-circle text-warning `)
+        }else{
+            $(`a[href="/chat/${data.username}"]`).find("i.status").attr("class", `status fa fa-circle text-success`)
+        }
+    })
+    // editing profile
+socket.on("editing_profile",data=>{
+            console.log(data)
+            $(`a[href="/chat/${data}"]`).find("i.status").attr("class", `status fa fa-circle text-warning `)
+        })
 
     //  typing
     arr = new Set()
     socket.on("type", data => {
-        spans = $($($(`a[href="/chat/${data.user}"]`).children().children()[1]).children()[2])
+        spans = $(`a[href="/chat/${data.user}"]`).find("span.span")
         arr.add(spans.text())
         if (data.user != current_user.value) {
             if (data.typing == true) {

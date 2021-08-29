@@ -12,7 +12,7 @@
                         <img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=35 height=35>
                     </div>
                     <div class="ps-2 ">
-                        <span class="fw-bold fs-4">
+                        <span class="fw-bold fs-4 user_name">
                             {{user.username}}
                         </span>
                         <br>
@@ -21,6 +21,10 @@
                                 Online
                               {% elif user.status == "secondary" %}
                                New User
+                              {% elif user.status == "Idle" %}
+                                Idle
+                              {% elif user.status == "edit" %}
+                              Editing Profile
                                {% elif user.status == "deleted" %}
                                Last Seen {{user.last_active}} 
                                {% else %}
@@ -233,7 +237,7 @@ function dis(msg){
         const hasNumber = /\d/;
         var timeout
         let date = document.querySelector("#status")
-        if (date.innerText != "New User" && date.innerText != "Online") date.innerText = "Last Seen " +format_date(date.innerText)
+        if (date.innerText != "New User" && date.innerText != "Online" && date.innerText!= "Idle" && date.innerText!= "Editing Profile") date.innerText = "Last Seen " +format_date(date.innerText)
         msg_date = document.querySelectorAll(".times")
         msg_date.forEach(e => {
           e.innerText = format_date(e.innerText)
@@ -269,11 +273,12 @@ function dis(msg){
             })
         })
         $(document).on("visibilitychange",()=>{
-            if (document.visibilityState === "hidden") {
-                
+            if (document.visibilityState == "hidden") {
+                  socket.emit("idle",{status:"Idle",user:decodeURI(document.location.pathname.slice(6))})
               } else  {
                 setTimeout(function() {$("title").text("ChatApp")}, 2000);
-                
+                  socket.emit("idle",{status:"Online",user:decodeURI(document.location.pathname.slice(6))})
+                  
               }
         })
 
@@ -327,25 +332,38 @@ function dis(msg){
       // socket listening events
 
 
-                socket.on("disconnect", (reason) => {
+        socket.on("disconnect", (reason) => {
             dis("You have disconnected from the server. Reconnecting...")
         });
         socket.io.on("reconnect", () => {
             dis("You have successfully reconnected to server.")
           });
+        socket.on("user_idle",data =>{
+          console.log(data)
+          if (data.username ==  decodeURI(document.location.pathname.slice(6))){
+            $("#status").text(data.stat)
+          }
+        })
         socket.on("status", data => {
 
-          if (data.user != "{{current_user.username}}" && data.user == document.location.pathname.slice(6)){
+          if (data.user != "{{current_user.username}}" && data.user == decodeURI(document.location.pathname.slice(6))){
            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${format_date(data.status)}`)
           }
+        })
+        socket.on("username_changed",data =>{
+          if (decodeURI(document.location.pathname.slice(6)) == data.old) $(".user_name").html(data.new)
+        })
+        socket.on("editing_profile",data=>{
+          console.log(data)
+          if (data == decodeURI(document.location.pathname.slice(6))) $("#status").text("Editing Profile")
         })
         socket.on("deleted_all", data => {
           append_no_msg()
 
         })
         socket.on("account_delete",(data)=>{
-          console.log(document.location.pathname.slice(6) == data,"fsfsfs")
-          if (document.location.pathname.slice(6) == data){
+          console.log(decodeURI(document.location.pathname.slice(6)) == data,"fsfsfs")
+          if (decodeURI(document.location.pathname.slice(6)) == data){
             $(".input-group").html(`<p class="w-100 mb-0 text-dark text-center">You can't send message anymore.<br>The user deleted their account.</p>`)
           }
         })
@@ -358,10 +376,10 @@ function dis(msg){
               format_date(data.status)}`)
           }
             if (data.user == "{{current_user.username}}") {
-                if (data.rec_user == document.location.pathname.slice(6)) {
+                if (data.rec_user == decodeURI(document.location.pathname.slice(6))) {
                     write(data.msg, "right", data.date,data.id,data.user)
                 }
-            } else if (data.user == document.location.pathname.slice(6)) {
+            } else if (data.user == decodeURI(document.location.pathname.slice(6))) {
                 write(data.msg, "left", data.date,data.id,data.user)
                 if (!hasNumber.test($("title")[0].innerText)){
                   if (document.hidden){
@@ -396,7 +414,7 @@ function dis(msg){
 
       socket.on("type", data => {
     let original_status = $("#status").text()
-    if (data.user == document.location.pathname.slice(6)){
+    if (data.user == decodeURI(document.location.pathname.slice(6))){
     if (data.typing == true) {
         $("#status").html("<span style='color:green;font-weight:bolder;'>Typing..<span>")        
     }

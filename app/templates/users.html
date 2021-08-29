@@ -66,9 +66,12 @@
                             <div class="ps-2" style="white-space: nowrap;">
                                 <span class="fw-bold text-dark fs-5 main-data">
                                   {% if user.status == "Online" %} 
-                                        <i class="status fa fa-circle text-success {{user.username}}" aria-hidden="true" ></i>
+                                        <i class="status fa fa-circle text-success " aria-hidden="true" ></i>
+                                        {% elif user.status == "Idle" or user.status == "edit" %}
+                                        <i class="status fa fa-circle text-warning " aria-hidden="true" ></i>
+
                                         {% else %}
-                                        <i class="status fa fa-circle text-secondary {{user.username}}" aria-hidden="true" ></i>
+                                        <i class="status fa fa-circle text-secondary " aria-hidden="true" ></i>
                                     {% endif %}
 
                                     <span  class="names">{{user.username}}</span>

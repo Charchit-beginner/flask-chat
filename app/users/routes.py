@@ -71,6 +71,9 @@ def logout():
 @users.route("/edit_profile",methods=["GET", "POST"])
 @login_required
 def edit():
+    socketio.emit("editing_profile",current_user.username,broadcast=True)
+    current_user.status = "edit"
+    db.session.commit()
     if current_user.email_confirmed == False:
         flash("Please Confirm Your E-mail address to Continue","info")
         return redirect("/confirm_email")
@@ -78,6 +81,9 @@ def edit():
     form  = Account()
     if request.method == "POST" :
         if form.validate_on_submit():
+            if current_user.username != form.username.data:
+                print("hi")
+                socketio.emit('username_changed' ,{"old":current_user.username,"new":form.username.data},broadcast=True)
             current_user.username = form.username.data
             if form.pic.data:
                 picture_file = save_picture(form.pic.data)
