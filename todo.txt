@@ -105,17 +105,17 @@ $(".edit_chat").click(function(){
 21 - fixing update issues - done
 23 - change status to idle when user not on page - done
 24 - change status to editing profile when on profile - done
-22 - update page on reconnect
-1. make friends ,remove friends
+1. block system - done
+8. dark mode -done
 
 
 // later ideas 
+22 - update page on reconnect
 2. edit message
 3. seen unseen , better updating
 4. reply message
 5. make groups
 6. select messages
 7. make context menus and dropdowns animated - not done
-8. dark mode
 9. notification
 10. bring messages after scrolling

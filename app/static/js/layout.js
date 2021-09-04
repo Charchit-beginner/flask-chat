@@ -7,9 +7,9 @@ function myFunction(x) {
         $(".card").attr("class", "container card px-2 pt-2  justify-content-center")
         $("body").attr("class", "d-flex")
         $(".con").attr("class", "h-100 px-3 py-3 con")
-        $(".user").css({"height":$(".card").height() -170})
+        $(".user").css({"height":$(".card").height() -250})
         $(window).resize( function(){
-        $(".user").css({"height":$(".card").height() -170})
+        $(".user").css({"height":$(".card").height() -250})
 
 });
     } else {
@@ -23,11 +23,22 @@ function myFunction(x) {
         $(".user").css({"height":"284px"})
         $(window).resize( function(){
         $(".user").css({"height":"284px"})
-
-
 });
     }   
 }
+const mode = ('; '+document.cookie).split(`; mode=`).pop().split(';')[0];
+var slider = document.querySelector(".slider")
+let checkbox = document.querySelector("input[type='checkbox']")
+if(mode == "Dark"){
+    checkbox.checked = true
+}
+else{
+    checkbox.checked = false
+    
+
+}
+
+
 var x = window.matchMedia("(max-width: 575px)")
 myFunction(x)
 x.addListener(myFunction)

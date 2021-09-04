@@ -1,3 +1,14 @@
+:root{
+    --form-background:white;
+    --form-color:black;
+    --form-border-color:white;
+    --drop-menu:black;
+}
+.form-control{
+    background: var(--form-background);
+    color:var(--form-color);
+    border-color:var(--form-border-color);
+}
 .left {
     background: white;
     margin-left: 10px;
@@ -53,10 +64,16 @@
     display: none;
     z-index: 3;
 }
-
+.dark-input{
+    background: rgb(54, 57, 63)!important;
+    color: white!important;
+    border-color: rgb(54, 57, 63)!important;
+}
 @media only screen and (max-width: 575px) {
     .input-group {
         margin-bottom: 0px!important;
         height: 50px;
     }
 }
+
+

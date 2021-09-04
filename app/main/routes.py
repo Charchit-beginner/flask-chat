@@ -61,9 +61,7 @@ def test_disconnect():
         print('Client disconnected')
 
 
-# @socketio.on('disconnect',namespace="/")
-# def dis():
-#     print("dis user from here")
+
 
 @socketio.on('typing')
 @authenticated_only
@@ -77,11 +75,31 @@ def typing(data):
 @socketio.on('idle')
 @authenticated_only
 def idle(data):
+    print(data)
     if not current_user.is_anonymous and current_user.status[0:4] != "Last":
         emit("user_idle",{"stat":data["status"],"username":current_user.username},broadcast=True)
 
         current_user.status = "Idle" if data["status"] == "Idle" else "Online"
+
         db.session.commit()
+        print(current_user.status)
+
+@socketio.on('block')
+@authenticated_only
+def block(data):
+    if not  current_user.is_anonymous:
+        for i in list(sids):
+            if   sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == current_user.username:
+                emit("block",{"type":data["type"],"user":data["user"]},room=i)
+        if data["type"] == "unblock":
+            block = Blocks.query.filter_by(user=current_user.username,user2=data["user"]).first()
+            db.session.delete(block)
+        else:
+            block = Blocks(user=current_user.username,user2=data["user"])
+            db.session.add(block)
+
+        db.session.commit()
+
 
 @socketio.on('change')
 @authenticated_only
@@ -119,20 +137,30 @@ def handle_message(data):
 @authenticated_only
 def handle_message(data):
     if not current_user.is_anonymous  and not userDeleted(data["user"]):
+        if data["user"] in [i.user2 for i in current_user.blocked_users]:
+            return "You need to unblock to send messages to user!"
         if len(data["msg"]) < 2000:
+            block = Blocks.query.filter_by(user2=current_user.username).all()
             rec_user = Detail.query.filter_by(username=data["user"]).first()
+            print(rec_user.status)
             msg = Message(msg=data["msg"],msg_type="right",get_user=data["user"],owner=current_user,time=datetime.utcnow())
-            msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
             db.session.add(msg)
-            db.session.add(msg1)
+            if data["user"] not in [i.user for  i in block]:
+                msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
+                db.session.add(msg1)
             db.session.flush()
+            print(rec_user.status)
+            for i in block:
+                print(i.user,i.user2)
             for i in list(sids):
-
-                if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
-                    print(data)
+                if (sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i] not in [i.user for  i in block]:
+                    print(sids[i],sids[i] not in [i.user for  i in block])
+                    print(data,current_user.username)
+                    user_stat = rec_user.status
                     emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
+
             db.session.commit()
-            return "done!"
+            return "Message sent!"
         else:
             emit("error_msg",{"error":"Limit of sending 2000 characters message exceeded"})
 
@@ -150,18 +178,17 @@ def get_img(img):
 @main.route("/")  
 @login_required
 def index():
-    users = Detail.query.filter(Detail.username!=current_user.username).all()
+    users = Detail.query.filter(Detail.username!=current_user.username,).all()
     # message = current_user.user_message1
     a,b= [],[]
-
-    for  i in users:
+    for i in users:
         message = Message.query.filter_by(username=current_user.username,get_user=i.username).order_by(Message.id.desc()).first()
 
         msg = Message.query.filter(Message.username==current_user.username,Message.get_user==i.username,Message.time > current_user.last_active).all()
         d = Message.query.filter(Message.username==current_user.username,Message.get_user==i.username).all()
         b.append(msg)    
         a.append(message)
-    return render_template("users.html",users=users,msg=a,unseen_msg=b)
+    return render_template("users.html",users=users,msg=a,unseen_msg=b,blocked_users=[i.user2 for i in current_user.blocked_users])
 
 
 @main.route("/chat/<user>")
@@ -171,5 +198,10 @@ def chat(user):
     User = Detail.query.filter(Detail.username==user,Detail.username!=current_user.username).first()
     if not User:
         abort(404)
+    block = Blocks.query.filter_by(user=current_user.username,user2=user).first()
     message = Message.query.filter_by(username=current_user.username,get_user=User.username).order_by(Message.time).all()
-    return render_template("index.html",user=User,message=message) 
+    return render_template("index.html",user=User,message=message,block=block) 
+
+@main.route("/service-worker.js")
+def return_file():
+    return Response("importScripts('https://sdk.pushy.me/web/1.0.8/pushy-service-worker.js');", mimetype='  text/javascript')

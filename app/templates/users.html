@@ -1,10 +1,13 @@
 {% extends "layout.html" %}
 
+{% block headscript %}
+<script src="https://sdk.pushy.me/web/1.0.8/pushy-sdk.js"></script>
+    {% endblock %}
 {% block style %}
 <link href="{{url_for('static',filename='css/users.css')}}" rel="stylesheet" type="text/css">
     {% endblock %}
 {% block body %}
-    <div class="w-25 mx-auto main-div">
+    <div class="w-25 mx-auto main-div" style="border-radius: 17px;">
         <div class="container card py-3">
             {% include "flash.html" %}
             <div class="px-3 py-3 h-100 con">
@@ -14,7 +17,7 @@
                             <img class="rounded-circle border pfp border-dark" height="50" src="{{current_user.pic|get_img}}" width="50">
                             
                         </div>
-                        <div class="ps-2">
+                        <div class="ps-2" style="max-width:170px">
                             <span class="fw-bold fs-5">
                                 {{current_user.username}}
                             </span>
@@ -36,6 +39,15 @@
                         </form>
                     </div>
                 </div>
+                <hr>
+                <div class="fs-1 d-flex align-items-center justify-content-between">
+      <span class="fs-5 fw-bold mode"></span>
+      <label class="switch">
+  <input type="checkbox">
+  <span class="slider round"></span>
+</label>
+    </div>
+
                 <hr>
                     <div class="input-group mb-3 align-items-center justify-content-around">
                         <p class="text-muted fw-bold mb-0 p-desc">
@@ -60,7 +72,8 @@
                         {% endif %}
                         {% for user in users %}
                         <a href="/chat/{{user.username}}" >
-                        <div class="align-items-center d-flex hover py-2">
+
+                        <div class="align-items-center d-flex hover py-2{% if user.username in blocked_users%} d-none blocked{% endif %}">
                             <img class="rounded-circle border border-dark" height="40" src="{{user.pic|get_img}}" width="40" style="aspect-ratio:16/9;">
                             
                             <div class="ps-2" style="white-space: nowrap;">
@@ -88,7 +101,7 @@
                                 </span>
                             </div>
                             <div class="d-flex justify-content-end w-100">
-                                <span class="rounded-circle bg-success text-light unseen" >
+                                <span class="rounded-circle bg-primary text-light unseen" >
                                 {% for i in unseen_msg %}
                                         {% for a in i%}
                                         {% if a.get_user == user.username and a.msg_type == "left" and loop.index == 1%}
@@ -99,13 +112,20 @@
                                         </span>
                                     </div>
                         </div>
-                        <hr class="m-0 text-dark">
+                        
+                        <hr class="m-0 text-dark {% if user.username  in blocked_users %} hidden-hr d-none{% endif %}">
+                            
                     </a>
                         
                             {% endfor %}
+
                        
                     </div>
-                
+                {% if blocked_users|length != 0%}
+                <div class="text-center">
+                    <button class="btn btn-dark btn-sm mt-2 block-users">Show Blocked Users</button>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

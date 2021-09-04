@@ -14,19 +14,20 @@ $(document).ready(function() {
 
     }
     $(".fa-volume-up").click((e)=>{
-        document.cookie = "muted=true"
+        document.cookie = "muted=true;expires=Thu, 18 Dec 2100 12:00:00 UTC"
         vol(true)
     })
     $(".fa-volume-mute").click((e)=>{
-        document.cookie = "muted=false"
+        document.cookie = "muted=false;expires=Thu, 18 Dec 2100 12:00:00 UTC"
         vol(false)
     })
-    if (document.cookie == "muted=true"){
-        vol(true)
-    }
-    else{
-        vol(false)
-    }
+    const muted = ('; '+document.cookie).split(`; muted=`).pop().split(';')[0];
+        if (muted == "true"){
+          vol(true)
+        }
+        else{
+          vol(false)
+        }
 
 
 
@@ -65,9 +66,9 @@ $(document).ready(function() {
             dis("You have successfully reconnected to server.")
           });
     
-    unseen = document.querySelectorAll(".unseen")
+    var unseen = document.querySelectorAll(".unseen")
     unseen.forEach(e => {
-        console.log(e.innerText == "")
+        
         if (e.innerText == "") $(e).hide()
     });
     document.querySelectorAll(".span").forEach(function(e) {
@@ -146,7 +147,7 @@ socket.on("editing_profile",data=>{
         })
 
     //  typing
-    arr = new Set()
+    const arr = new Set()
     socket.on("type", data => {
         spans = $(`a[href="/chat/${data.user}"]`).find("span.span")
         arr.add(spans.text())
@@ -159,6 +160,22 @@ socket.on("editing_profile",data=>{
             }
         }
     })
+    // show blocked users
+    $(".block-users").click(e=>{
+        
+        if ($(e.target).text() == "Show Blocked Users"){
+            $(".blocked").removeClass("d-none")
+            $(".hidden-hr").removeClass("d-none")
+            $(e.target).text("Hide Blocked Users")
+            unseen.forEach(e => {if (e.innerText == "") $(e).hide()});
+        }
+        else{
+            $(e.target).text("Show Blocked Users")
+            $(".hidden-hr").addClass("d-none")
+            $(".blocked").addClass("d-none")    
+        }
+    })
+
     socket.on("connect", () => {
         socket.emit("connected", document.location.pathname)
     }); // search of on
@@ -177,7 +194,8 @@ socket.on("editing_profile",data=>{
         $(".p-desc").removeClass("d-none")
         $("#my_inp").addClass("d-none")
     })
-})
+    })
+
 //  search filter
 const isnone = (currentValue) => currentValue.style.display == "none";
 var search = () => {
@@ -202,8 +220,47 @@ var search = () => {
         $(".nouser").remove()
     }
 }
+// togle between dark and white mode
+let check = document.querySelector("input[type='checkbox']")
+document.addEventListener("change",()=>{
+    if (check.checked){
+        document.cookie = "mode=Dark;expires=Thu, 18 Dec 2100 12:00:00 UTC"
+        check_mode()
+    }
+    else{
+        document.cookie = "mode=Light;expires=Thu, 18 Dec 2100 12:00:00 UTC"
+        check_mode()
+    }
+    // hover:#202225
+})
+check_mode()
 
 // funtions 
+function check_mode(){
+    const mode = ('; '+document.cookie).split(`; mode=`).pop().split(';')[0];
+    if (mode == "Dark"){
+              $("body").css({"background":"#000000c2"})
+        $(".card").css({"background":"#141415","color":"#8e9297"})
+        $(".btn-dark").css({"color":"white","background-color":"#252a41"})
+        document.querySelectorAll(".hover").forEach((e)=>{
+            e.style.setProperty('--td-background-color', '#202225')
+    })
+        $(".text-dark").addClass("text-light").removeClass("text-dark")
+        $(".rounded").addClass("bg-dark").addClass("text-light")
+    }
+    else{
+              $("body").css({"background":"#f4f4f4"})
+        $(".card").css({"background":"white","color":"black"})
+        $(".btn-dark").css({"color":"white","background-color":"#212529"})
+        document.querySelectorAll(".hover").forEach((e)=>{
+            e.style.setProperty('--td-background-color', '#ebebeb')
+        })
+        $(".rounded").removeClass("bg-dark").removeClass("text-light")
+        $(".text-light").addClass("text-dark").removeClass("text-light")
+        $(".unseen").addClass("text-light").removeClass("text-dark")
+    }
+    $(".mode").text(`${mode!="" ? mode:"Light"}  mode`)
+}
 function dis(msg){
     $(".container").prepend(`<div class="alert  alert-success alert-dismissible fade show" role="alert" style="position:fixed; width:${$(".container").width()}px; z-index:11;">
     ${msg}

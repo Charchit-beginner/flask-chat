@@ -4,16 +4,17 @@
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
     {% endblock %}
     {% block body %}
-            <div class="w-25 mx-auto main-div">
+            <div class="w-25 mx-auto main-div" style="border-radius: 17px;">
         <div class="container card px-0 pb-3 pt-2" style="padding:0px!important" >
           <div class="d-flex pb-2" style="box-shadow: 0px 2px 10px rgb(0 0 0 / 25%); z-index: 10; ">
                     <div class="d-flex align-items-center ms-3">
-                      <a href="/"><i class="fa fa-arrow-left me-2" aria-hidden="true"></i></a>
+                      <a href="/"><i class="fa fa-arrow-left me-2 fa-lg" aria-hidden="true"></i></a>
                         <img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=35 height=35>
                     </div>
-                    <div class="ps-2 ">
+                    <div class="ps-2 w-100">
                         <span class="fw-bold fs-4 user_name">
                             {{user.username}}
+                             <i class="fas fa-volume-up fa-xs "></i><i class="fas fa-volume-mute  d-none"></i>
                         </span>
                         <br>
                             <span id="status">
@@ -33,6 +34,12 @@
                                 
                             </span>
                     </div>
+<div class="fs-1 d-flex align-items-center justify-content-between me-2">
+      <label class="switch">
+  <input type="checkbox">
+  <span class="slider round"></span>
+</label>
+    </div>
                 </div>
     <div id="container" style="overflow-y: auto; height:100%; background: #f8f8f8">
           {% include "flash.html" %}
@@ -41,6 +48,13 @@
       <div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
                             <p class="text-center text-muted">
                                 No messages available. Once You send they will appear here
+                                <br>  
+                                <br>  
+                                {% if block %}
+                                <button class="btn btn-dark btn-sm block">Unblock User</button>
+                                {% else %}
+                                <button class="btn btn-dark btn-sm block">Block User</button>
+                                {% endif %}
                             </p>
                         </div>
                       {% endif %}
@@ -59,11 +73,14 @@
        <button class="scroll btn btn-light btn-sm" type="button" ><i class="fas fa-angle-down" ></i></button>
     </div>
 <div class="input-group" style="box-shadow: 0px -3px 10px rgb(0 0 0 / 25%); z-index: 10;">
-   {% if user.status != "deleted" %}
+  {% if block %}
+  <p class="w-100 mb-0  text-center ">You blocked the contact. <br>Unblock to send message.</p>
+   {% elif user.status != "deleted" %}
   <input type="text" id="my_inp" class="form-control" placeholder="Type a message..." maxlength="1999" autocomplete="off">
-  <button class="btn btn-dark" type="submit" id="send"><i class="fab fa-telegram-plane"></i></button>
+  <button class="btn btn-dark" type="submit" id="send" onclick="send()"><i class="fab fa-telegram-plane"></i></button>
 {% else %}
-  <p class="w-100 mb-0 text-dark text-center">You can't send message anymore.<br>The user deleted their account.</p>
+  <p class="w-100 mb-0  text-center">You can't send message anymore.<br>The user deleted their account.</p>
+
 {% endif %}
 </div>
 
@@ -81,9 +98,12 @@
 
 
     //custom functions to be called
-
-
-
+    var timeout
+    "{% if block%}"
+    var block_type = "Unblock User"
+    "{% else %}"
+    var block_type = "Block User"
+    "{% endif %}"
     function resize_div() {
     $(".message").css({
         "max-width": `${$(".card").width()-100}px`
@@ -130,8 +150,12 @@
         e.preventDefault();
         if (cl.classList[1] == "right") {
           $(drop).html(`<li><button  class="delme dropdown-item">Delete for me</button></li><button class=" delev dropdown-item" >Delete For everyone</button></li>
-            <li><button  class="dropdown-item edit_chat">Edit Message</button><li><button class="dropdown-item del_msgs">Delete all</button></li>`)
-        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li><li><button class="dropdown-item del_msgs">Delete all</button></li>`)}
+            <li><button  class="dropdown-item edit_chat">Edit Message</button><li><button class="dropdown-item del_msgs">Delete all</button></li><li>
+            <button class="dropdown-item block">${block_type}</button></li>`)
+        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li><li><button class="dropdown-item del_msgs">Delete all</button></li><li><button class="dropdown-item block">${block_type}</button></li>`)}
+        if (document.querySelector("input[type='checkbox']").checked){
+          $(".dropdown-item").css("color","white")
+        }
         drop.style.display = "block"
         pos = position(e)
         drop.style.left = pos.x + "px"
@@ -144,7 +168,11 @@
         ids = e.target.id
       }
       console.log(e)
-      
+        $(".block").click(function(e){
+         
+            socket.emit("block",{user:"{{user.username}}",type:e.target.innerText== "Unblock User" ? "unblock":"block"})
+        
+        })
         $(".delot").click(function(){
           if (confirm("Do you really want to delete this?!")){
           socket.emit("change",{id:ids,type:"user_d",user:"{{user.username}}",current_user:"{{current_user.username}}"})
@@ -183,6 +211,7 @@
         
     }
         const format_date = (date) => {
+          console.log(date)
           d = new Date(date + " UTC")
           formatted_date = `${d.toDateString().slice(4,10)} ${d.toTimeString().slice(0,5)}`
           
@@ -192,6 +221,13 @@
         $("#container").html(`<div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
                             <p class="text-center text-muted">
                                 No messages available. Once You send they will appear here
+                                <br>
+                                <br>
+                                {% if block %}
+                                <button class="btn btn-dark btn-sm">Unblock User</button>
+                                {% else %}
+                                <button class="btn btn-dark btn-sm">Block User</button>
+                                {% endif %}
                             </p>
                         </div>`)
     }
@@ -219,7 +255,18 @@ function dis(msg){
 </div>`)
            setTimeout(function() {$(".show").hide()}, 2000);
 }
-
+function send(){
+          if ($("#my_inp").val() != "") {
+                clearTimeout(timeout)
+                socket.emit("message", {
+                    msg: $("#my_inp").val(),
+                    user: "{{user.username}}"
+                }, (d) => {
+                    console.log(d)
+                })
+                $("#my_inp").val("")
+            }
+          }
 
 
 // document ready events
@@ -228,7 +275,8 @@ function dis(msg){
 
     $(document).ready(function() {
         const audio = new Audio("{{url_for('static',filename='audio/notification.mp3')}}")
-        if (document.cookie == "muted=true"){
+        const muted = ('; '+document.cookie).split(`; muted=`).pop().split(';')[0];
+        if (muted){
           audio.muted = true
         }
         else{
@@ -301,23 +349,10 @@ function dis(msg){
         $(document).keypress(event => {
           
           if(event.which==13){
-            $("#send").trigger("click")
+            send()
         }
       })
-        $("#send").click(function(e) {
-          if ($("#my_inp").val() != "") {
-                clearTimeout(timeout)
-                socket.emit("message", {
-                    msg: $("#my_inp").val(),
-                    user: "{{user.username}}"
-                }, (d) => {
-                    if (d == "done!") {
-                        console.log("client recieved the message")
-                    }
-                })
-                $("#my_inp").val("")
-            }
-        })}
+      }
         catch{
           console.log("error")
         }
@@ -327,8 +362,40 @@ function dis(msg){
           socket.emit("delete_all_msg",{user:"{{user.username}}",current_user:"{{current_user.username}}"})
         })
 
+        $(".block").click(function(e){
+         
+            socket.emit("block",{user:"{{user.username}}",type:e.target.innerText== "Unblock User" ? "unblock":"block"})
+      
+        })
+        function vol(muted){
+        if (muted){
+        audio.muted = true
+        $(".fa-volume-up").addClass("d-none")
+        $(".fa-volume-mute").removeClass("d-none")
+    }else{
+        audio.muted = false
+        $(".fa-volume-mute").addClass("d-none")
+        $(".fa-volume-up").removeClass("d-none")
+}
 
+    }
+    $(".fa-volume-up").click((e)=>{
+        document.cookie = "muted=true;expires=Thu, 18 Dec 2100 12:00:00 UTC;path=/"
+        vol(true)
+    })
+    $(".fa-volume-mute").click((e)=>{
+        document.cookie = "muted=false;expires=Thu, 18 Dec 2100 12:00:00 UTC;path=/"
+        vol(false)
+    })
 
+    const mute = ('; '+document.cookie).split(`; muted=`).pop().split(';')[0];
+        if (mute == "true"){
+          
+          vol(true)
+        }
+        else{
+          vol(false)
+        }
       // socket listening events
 
 
@@ -338,9 +405,33 @@ function dis(msg){
         socket.io.on("reconnect", () => {
             dis("You have successfully reconnected to server.")
           });
+        socket.on("block",data=>{
+          console.log(data.user)
+          if(data.user == decodeURI(document.location.pathname.slice(6))){
+          if (data.type == "unblock" ){
+            $(".input-group").html(
+              `<input type="text" id="my_inp" class="form-control" placeholder="Type a message..." maxlength="1999" autocomplete="off">
+  <button class="btn btn-dark" type="submit" id="send" onclick="send()"><i class="fab fa-telegram-plane"></i></button>`)
+
+            if (document.querySelector("input[type='checkbox']").checked){
+              $(".form-control").addClass("dark-input")
+    }
+           block_type = "Block User"
+            $(".block").text("Block User")
+        }
+        else{
+
+          $(".input-group").html(`<p class="w-100 mb-0  text-center">You blocked the contact. <br>Unblock to send message.</p>`)
+            block_type = "Unblock User"
+            $(".block").text("Unblock User")
+
+        }
+      }
+        })
         socket.on("user_idle",data =>{
           console.log(data)
           if (data.username ==  decodeURI(document.location.pathname.slice(6))){
+            console.log("yes it did")
             $("#status").text(data.stat)
           }
         })
@@ -364,17 +455,19 @@ function dis(msg){
         socket.on("account_delete",(data)=>{
           console.log(decodeURI(document.location.pathname.slice(6)) == data,"fsfsfs")
           if (decodeURI(document.location.pathname.slice(6)) == data){
-            $(".input-group").html(`<p class="w-100 mb-0 text-dark text-center">You can't send message anymore.<br>The user deleted their account.</p>`)
+            $(".input-group").html(`<p class="w-100 mb-0  text-center">You can't send message anymore.<br>The user deleted their account.</p>`)
           }
         })
+
+    const arr = new Set()
         socket.on("msg", data => {
         
 
             $(".empty").remove()
-            if (data.status != "secondary"){
-            data.status == "Online" ? $("#status").text(data.status) : $("#status").text(`Last seen ${
-              format_date(data.status)}`)
-          }
+            console.log(data)
+
+                var span_text = arr.values().next().value;
+                $("#status").text(span_text)
             if (data.user == "{{current_user.username}}") {
                 if (data.rec_user == decodeURI(document.location.pathname.slice(6))) {
                     write(data.msg, "right", data.date,data.id,data.user)
@@ -426,4 +519,7 @@ function dis(msg){
 
     });
    </script>
+    {% endblock %}
+        {% block script %}
+        <script src="{{url_for('static',filename='js/app.js')}}" type="text/javascript" charset="utf-8" ></script>
     {% endblock %}

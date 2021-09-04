@@ -9,6 +9,7 @@ def load_user(user_id):
     return Detail.query.get(int(user_id))
 
 
+
 class Detail(db.Model,UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(35),unique=True, nullable=False)
@@ -21,7 +22,14 @@ class Detail(db.Model,UserMixin):
     otp =  db.Column(db.String(7),nullable=True)
     email_confirmed =  db.Column(db.Boolean, nullable=False, default=False)
     user_message1 = db.relationship("Message", backref="owner",cascade="all, delete, delete-orphan")
+    blocked_users =  db.relationship("Blocks",backref="blocker")
     # def __init__()
+
+class Blocks(db.Model):
+    sno = db.Column(db.Integer,primary_key=True)
+    user = db.Column(db.String(35),db.ForeignKey("detail.username"))
+    user2 = db.Column(db.String(35))
+
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +38,6 @@ class Message(db.Model):
     username = db.Column(db.String(35),db.ForeignKey("detail.username"))
     get_user = db.Column(db.String(35))
     time = db.Column(db.DateTime)
-
 
 
 # from app import db,create_app
