@@ -13,6 +13,7 @@
                 </h3>
             </div>
             <div class="col">
+
                 <div class="dropdown float-end">
                     <a aria-expanded="false" class="dropdown-toggle text-muted" data-bs-toggle="dropdown" href="#" id="dropdownMenuLink">
                         Hello {{current_user.username}}
@@ -29,7 +30,9 @@
                             </a>
                         </li>
                     </ul>
+                   {% include "toogle_checkbox.html"%}
                 </div>
+
             </div>
         </div>
         <form action="" method="POST">
@@ -113,7 +116,7 @@
                     {% endif %}
             </div>
             <div class="d-grid gap-2 mt-2">
-                {{ form.submit(class="btn btn-primary text-center")}}
+                {{ form.submit(class="btn btn-dark text-center")}}
             </div>
         </form>
     </div>
@@ -121,5 +124,7 @@
 {% endblock %}
 {% block script %}
 <script charset="utf-8" src="{{url_for('static',filename='js/otp.js')}}" type="text/javascript">
+</script>
+<script charset="utf-8" src="{{url_for('static',filename='js/checkmode.js')}}" type="text/javascript">
 </script>
 {% endblock %}

@@ -85,3 +85,11 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+.dark-input{
+    background: rgb(54, 57, 63)!important;
+    color: white!important;
+    border-color: rgb(54, 57, 63)!important;
+}
+.dropdown-item:hover{
+  background:rgba(165, 165, 165, 0.349)!important;
+}

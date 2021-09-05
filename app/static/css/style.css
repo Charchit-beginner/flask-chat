@@ -64,11 +64,7 @@
     display: none;
     z-index: 3;
 }
-.dark-input{
-    background: rgb(54, 57, 63)!important;
-    color: white!important;
-    border-color: rgb(54, 57, 63)!important;
-}
+
 @media only screen and (max-width: 575px) {
     .input-group {
         margin-bottom: 0px!important;

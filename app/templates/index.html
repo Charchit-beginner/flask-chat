@@ -14,7 +14,7 @@
                     <div class="ps-2 w-100">
                         <span class="fw-bold fs-4 user_name">
                             {{user.username}}
-                             <i class="fas fa-volume-up fa-xs "></i><i class="fas fa-volume-mute  d-none"></i>
+                             <i class="fas fa-volume-up fa-xs "></i><i class="fas fa-volume-mute fa-xs d-none"></i>
                         </span>
                         <br>
                             <span id="status">
@@ -34,12 +34,7 @@
                                 
                             </span>
                     </div>
-<div class="fs-1 d-flex align-items-center justify-content-between me-2">
-      <label class="switch">
-  <input type="checkbox">
-  <span class="slider round"></span>
-</label>
-    </div>
+                   {% include "toogle_checkbox.html"%}
                 </div>
     <div id="container" style="overflow-y: auto; height:100%; background: #f8f8f8">
           {% include "flash.html" %}
@@ -237,12 +232,12 @@
           '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
     }
 
-            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}">  <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
+            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}"> ${msg} <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
             </div>
           </div>
           `)
-        a = document.createTextNode(msg)
-        $(".message").last().append(a)
+        // a = document.createTextNode(msg)
+        // $(".message").last().append(a)
         $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${format_date(date)}</span></div>`)
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()
@@ -421,7 +416,7 @@ function send(){
         }
         else{
 
-          $(".input-group").html(`<p class="w-100 mb-0  text-center">You blocked the contact. <br>Unblock to send message.</p>`)
+          $(".input-group").html(`<p class="w-100 mb-0  text-center">{% if user.status != "deleted" %}You blocked the contact. <br>Unblock to send message.</p>{% else %}<p class="w-100 mb-0  text-center">You can't send message anymore.<br>The user deleted their account.</p>{% endif %}`)
             block_type = "Unblock User"
             $(".block").text("Unblock User")
 
