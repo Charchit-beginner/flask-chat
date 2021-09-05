@@ -7,9 +7,9 @@ function myFunction(x) {
         $(".card").attr("class", "container card px-2 pt-2  justify-content-center")
         $("body").attr("class", "d-flex")
         $(".con").attr("class", "h-100 px-3 py-3 con")
-        $(".user").css({"height":$(".card").height() -250})
+        $(".user").css({"height":$(".card").height() -260})
         $(window).resize( function(){
-        $(".user").css({"height":$(".card").height() -250})
+        $(".user").css({"height":$(".card").height() -260})
 
 });
     } else {

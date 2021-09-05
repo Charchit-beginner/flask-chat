@@ -232,12 +232,12 @@
           '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
     }
 
-            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}"> ${msg} <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
+            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}"> <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
             </div>
           </div>
           `)
-        // a = document.createTextNode(msg)
-        // $(".message").last().append(a)
+        a = document.createTextNode(msg)
+        $(".message").last().append(a)
         $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${format_date(date)}</span></div>`)
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()

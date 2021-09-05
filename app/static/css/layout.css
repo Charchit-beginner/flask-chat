@@ -23,7 +23,9 @@ a{
     width: 100%!important;
 }
 }
-
+.fas{
+    cursor: pointer;
+}
 
 /* checkbox toogle dark theme */
 .switch {
