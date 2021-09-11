@@ -107,6 +107,7 @@ $(".edit_chat").click(function(){
 24 - change status to editing profile when on profile - done
 1. block system - done
 8. dark mode -done
+9. notification - done
 
 
 // later ideas 
@@ -117,5 +118,4 @@ $(".edit_chat").click(function(){
 5. make groups
 6. select messages
 7. make context menus and dropdowns animated - not done
-9. notification
 10. bring messages after scrolling

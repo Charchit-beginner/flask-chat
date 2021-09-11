@@ -39,4 +39,5 @@ const mode = ('; '+document.cookie).split(`; mode=`).pop().split(';')[0];
         $(".dropdown-item").css("color","black")
     }
 }
+
 checkMode()

@@ -2,11 +2,10 @@ from  flask import Flask,Blueprint,render_template,session,request,redirect,flas
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_,and_,delete,select
 from flask_login import current_user, login_required
-from app import socketio,db
+from app import socketio,db,pushy
 from flask_socketio import emit, send, join_room, leave_room
 from app.models import *
 from app.main.utils import *
-import jsonpickle
 import functools
 from flask_login import current_user
 from flask_socketio import disconnect
@@ -152,13 +151,18 @@ def handle_message(data):
             print(rec_user.status)
             for i in block:
                 print(i.user,i.user2)
+
             for i in list(sids):
                 if (sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i] not in [i.user for  i in block]:
                     print(sids[i],sids[i] not in [i.user for  i in block])
                     print(data,current_user.username)
                     user_stat = rec_user.status
                     emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
+            if rec_user.status != "Online" and rec_user.status != "Idle" and data["user"] not in [i.user for  i in block]:
+                    notification = {'message':f"{current_user.username} - {data['msg']}",'url':'http://charchit-chat.herokuapp.com/chat/' + current_user.username,'image':'https://img.icons8.com/ios/50/000000/weixing.png',"title":"New Message from ChatApp"}
 
+                    pushy.push(rec_user.notification_id,notification)
+                    print("sent")
             db.session.commit()
             return "Message sent!"
         else:
@@ -191,10 +195,15 @@ def index():
     return render_template("users.html",users=users,msg=a,unseen_msg=b,blocked_users=[i.user2 for i in current_user.blocked_users])
 
 
-@main.route("/chat/<user>")
+@main.route("/chat/<user>",methods=['POST','GET'])
 @login_required
 def chat(user):
-    
+    if request.method == "POST":
+        not_id = request.form.get('id')
+        current_user.notification_id = not_id
+        db.session.commit()
+        return "ok"
+
     User = Detail.query.filter(Detail.username==user,Detail.username!=current_user.username).first()
     if not User:
         abort(404)

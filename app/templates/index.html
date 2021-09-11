@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-
+{% block headscript %}
+<script src="https://sdk.pushy.me/web/1.0.8/pushy-sdk.js"></script>
+    {% endblock %}
 {% block style %}
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
     {% endblock %}
@@ -60,7 +62,9 @@
         {% endif %}
         <div id="{{i.id}}" class="message  {{i.msg_type}}">
         <div class="float-end ms-2 change_btn"><i class="fa-angle-down {{i.msg_type}} fas fa-1x" ></i></div>
+        <span class="main-msg">
         {{i.msg}} 
+        </span>
         <div style="font-size: 10px"><span class="times float-end">{{i.time}}</span></div>
         </div>
       </div>
@@ -84,7 +88,7 @@
   <ul id="contextMenu" class="dropdown-menu">
     
   </ul>
-
+  <input type="text" id="copy_msg" style="position:fixed;top: -4000px;left:-4000px;">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
@@ -99,6 +103,20 @@
     "{% else %}"
     var block_type = "Block User"
     "{% endif %}"
+    function modify_str(message) {
+  if(!message) return;
+
+  var urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+  return message.replace(urlRegex, function (url) {
+    var hyperlink = url;
+    if (!hyperlink.match('^https?:\/\/')) {
+      hyperlink = 'http://' + hyperlink;
+    }
+    return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + '</a>'
+  }).replaceAll("<script>","&lt;script&gt;").replaceAll("<\/script>","&lt;/script&gt;")
+}
+
+
     function resize_div() {
     $(".message").css({
         "max-width": `${$(".card").width()-100}px`
@@ -146,8 +164,8 @@
         if (cl.classList[1] == "right") {
           $(drop).html(`<li><button  class="delme dropdown-item">Delete for me</button></li><button class=" delev dropdown-item" >Delete For everyone</button></li>
             <li><button  class="dropdown-item edit_chat">Edit Message</button><li><button class="dropdown-item del_msgs">Delete all</button></li><li>
-            <button class="dropdown-item block">${block_type}</button></li>`)
-        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li><li><button class="dropdown-item del_msgs">Delete all</button></li><li><button class="dropdown-item block">${block_type}</button></li>`)}
+            <button class="dropdown-item block">${block_type}</button></li><li><button class="dropdown-item  copy">Copy message</button></li>`)
+        } else {$(drop).html(`<li><button class="delot dropdown-item">Delete Message</button></li><li><button class="dropdown-item del_msgs">Delete all</button></li><li><button class="dropdown-item block">${block_type}</button></li><li><button class="dropdown-item copy">Copy Message</button></li>`)}
         if (document.querySelector("input[type='checkbox']").checked){
           $(".dropdown-item").css("color","white")
         }
@@ -163,6 +181,19 @@
         ids = e.target.id
       }
       console.log(e)
+      $(".copy").click(function(){
+        console.log(e)
+        try{
+        $("#copy_msg").val(e.target.children[1].innerText);
+
+        }
+        catch{
+        $("#copy_msg").val(e.target.parentElement.nextElementSibling.innerText);
+        }
+        $("#copy_msg").select();
+        document.execCommand("copy");
+        $("#copy_msg").val("");
+      })
         $(".block").click(function(e){
          
             socket.emit("block",{user:"{{user.username}}",type:e.target.innerText== "Unblock User" ? "unblock":"block"})
@@ -232,12 +263,12 @@
           '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
     }
 
-            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}"> <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
+            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}">${modify_str(msg)} <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
             </div>
           </div>
           `)
-        a = document.createTextNode(msg)
-        $(".message").last().append(a)
+        // a = document.createTextNode(modify_str(msg))
+        // $(".message").last().append(a)
         $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${format_date(date)}</span></div>`)
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()
@@ -293,7 +324,11 @@ function send(){
         document.onclick = hideMenu;
         div.forEach(e => {
             e.oncontextmenu = menu
+            
         });
+        document.querySelectorAll(".main-msg").forEach(e => {
+          e.innerHTML   = modify_str(e.innerText)
+        })
         btn.forEach(e => {
             e.onclick = menu
         });
@@ -517,4 +552,5 @@ function send(){
     {% endblock %}
         {% block script %}
         <script src="{{url_for('static',filename='js/app.js')}}" type="text/javascript" charset="utf-8" ></script>
+        <script src="{{url_for('static',filename='js/pushy_reg.js')}}" type="text/javascript" charset="utf-8" ></script>
     {% endblock %}

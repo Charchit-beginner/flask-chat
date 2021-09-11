@@ -6,7 +6,11 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
+from PushySDK import Pushy
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 app = Flask(__name__)
 db = SQLAlchemy()
 migrate = Migrate()
@@ -14,6 +18,8 @@ socketio = SocketIO()
 login_manager = LoginManager() 
 mail = Mail()
 bcrypt = Bcrypt()
+pushy=Pushy(os.getenv('PUSHY_API_KEY'))
+
 login_manager.login_view = 'users.signin'
 login_manager.login_message = "Login To Continue"
 login_manager.login_message_category = 'info'

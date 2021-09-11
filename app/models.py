@@ -21,6 +21,7 @@ class Detail(db.Model,UserMixin):
     otp_timing = db.Column(db.DateTime)
     otp =  db.Column(db.String(7),nullable=True)
     email_confirmed =  db.Column(db.Boolean, nullable=False, default=False)
+    notification_id = db.Column(db.String(68))
     user_message1 = db.relationship("Message", backref="owner",cascade="all, delete, delete-orphan")
     blocked_users =  db.relationship("Blocks",backref="blocker")
     # def __init__()
