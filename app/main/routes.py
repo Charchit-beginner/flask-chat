@@ -159,10 +159,12 @@ def handle_message(data):
                     user_stat = rec_user.status
                     emit('msg', {"msg":data["msg"],"user":current_user.username,"rec_user":rec_user.username,"status":rec_user.status,"date":format_date(),"id":msg.id} , room=i)
             if rec_user.status != "Online" and rec_user.status != "Idle" and data["user"] not in [i.user for  i in block]:
-                    notification = {'message':f"{current_user.username} - {data['msg']}",'url':'http://charchit-chat.herokuapp.com/chat/' + current_user.username,'image':'https://img.icons8.com/ios/50/000000/weixing.png',"title":"New Message from ChatApp"}
-
-                    pushy.push(rec_user.notification_id,notification)
-                    print("sent")
+                    notification = {'message':f"{current_user.username} - {data['msg']}",'url':'https://charchit-chat.herokuapp.com/chat/' + current_user.username,'image':'https://img.icons8.com/ios/50/000000/weixing.png',"title":"New Message from ChatApp"}
+                    try:
+                        pushy.push(rec_user.notification_id,notification)
+                        print("sent")
+                    except Exception as e:
+                        print(e)
             db.session.commit()
             return "Message sent!"
         else:
