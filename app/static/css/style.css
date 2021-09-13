@@ -63,6 +63,7 @@
     outline: none;
     display: none;
     z-index: 3;
+    padding: 0px 6px;
 }
 
 @media only screen and (max-width: 575px) {

@@ -60,8 +60,18 @@ def test_disconnect():
         print('Client disconnected')
 
 
-
-
+@socketio.on('get_data')
+@authenticated_only
+def get_data(data):
+    if not current_user.is_anonymous and not userDeleted(data["user"]):
+        msgs =  Message.query.filter(Message.id > data["last_id"],Message.username==current_user.username,Message.get_user==data["user"]).all()
+        a = {}
+        for i in msgs:
+                a[i.id] = {"msg":i.msg,"msg_type":i.msg_type,"time":str(i.time),"user":i.username}
+                
+        emit("rec_data",{"message":a,"status":Detail.query.filter_by(username=data["user"]).first().status})
+        
+    
 @socketio.on('typing')
 @authenticated_only
 def typing(data):
@@ -200,19 +210,37 @@ def index():
 @main.route("/chat/<user>",methods=['POST','GET'])
 @login_required
 def chat(user):
+    User = Detail.query.filter(Detail.username==user,Detail.username!=current_user.username).first()
     if request.method == "POST":
         not_id = request.form.get('id')
-        current_user.notification_id = not_id
-        db.session.commit()
+        if not_id:
+            current_user.notification_id = not_id
+            db.session.commit()
+        else:
+            no = int(request.form.get('no'))
+            msgs = Message.query.filter_by(username=current_user.username,get_user=User.username).order_by(Message.time).all()
+            print(len(msgs))
+            if 0 <len(msgs) - no < 30 :
+                msgs = msgs[:len(msgs) -no]
+            else:
+                msgs = msgs[len(msgs)- (no + 30) :len(msgs) - no]
+            print(msgs)
+            a = {}
+            for i in msgs:
+                a[i.id] = {"msg":i.msg,"msg_type":i.msg_type,"time":i.time,"user":i.username}
+            return a
         return "ok"
 
-    User = Detail.query.filter(Detail.username==user,Detail.username!=current_user.username).first()
     if not User:
         abort(404)
     block = Blocks.query.filter_by(user=current_user.username,user2=user).first()
     message = Message.query.filter_by(username=current_user.username,get_user=User.username).order_by(Message.time).all()
+    message = message[len(message) - 10:]
     return render_template("index.html",user=User,message=message,block=block) 
 
-@main.route("/service-worker.js")
+@main.route("/service-worker.js",methods=['POST','GET'])
 def return_file():
     return Response("importScripts('https://sdk.pushy.me/web/1.0.8/pushy-service-worker.js');", mimetype='  text/javascript')
+
+
+

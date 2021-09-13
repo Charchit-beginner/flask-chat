@@ -39,7 +39,7 @@
                    {% include "toogle_checkbox.html"%}
                 </div>
     <div id="container" style="overflow-y: auto; height:100%; background: #f8f8f8">
-          {% include "flash.html" %}
+          <img src="{{url_for('static',filename='images/loading.gif')}}" width="30" height="30" alt="loading...." class="d-none loading mx-auto" style="position:fixed; left: 50%; transform: translate(-50%, 0);">
 
       {% if message|length == 0 %}
       <div class="px-2 d-flex align-items-center justify-content-center h-100 empty">
@@ -237,7 +237,6 @@
         
     }
         const format_date = (date) => {
-          console.log(date)
           d = new Date(date + " UTC")
           formatted_date = `${d.toDateString().slice(4,10)} ${d.toTimeString().slice(0,5)}`
           
@@ -263,13 +262,14 @@
           '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
     }
 
-            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}">${modify_str(msg)} <div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div>
+            <div id=${user == "{{current_user.username}}" ? `${id}` : `${parseInt(id+1)}`} class="message ${pos}"><div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div> <span class="main-msg">
+${modify_str(msg)} </span><div style="font-size: 10px"><span class="float-end">${format_date(date)}</span></div>
             </div>
           </div>
           `)
         // a = document.createTextNode(modify_str(msg))
         // $(".message").last().append(a)
-        $(".message").last().append(`<div style="font-size: 10px"><span class="float-end">${format_date(date)}</span></div>`)
+        
         container.scrollTop = container.scrollHeight - container.clientHeight;
         resize_div()
     }
@@ -293,7 +293,10 @@ function send(){
                 $("#my_inp").val("")
             }
           }
-
+          function status(data){
+            if (data != "New User" && data != "Online" && data!= "Idle" && data!= "Editing Profile") return "Last Seen " +format_date(data)
+            return data
+          }
 
 // document ready events
 
@@ -310,8 +313,9 @@ function send(){
         }
         const hasNumber = /\d/;
         var timeout
+        var msg_count = 0
         let date = document.querySelector("#status")
-        if (date.innerText != "New User" && date.innerText != "Online" && date.innerText!= "Idle" && date.innerText!= "Editing Profile") date.innerText = "Last Seen " +format_date(date.innerText)
+        date.innerText = status(date.innerText)
         msg_date = document.querySelectorAll(".times")
         msg_date.forEach(e => {
           e.innerText = format_date(e.innerText)
@@ -338,6 +342,41 @@ function send(){
         });
         container.scrollTop = container.scrollHeight - container.clientHeight;
         $(container).scroll(function() {
+          if (container.scrollTop == 0){
+            $(".loading").removeClass("d-none")
+                $.ajax({
+        type: "POST",
+        url: `${window.location.pathname}`,
+        data: {
+          no:$(".message").length
+        },
+        
+        success: function(data) {
+          console.log(data)
+
+        let first_elem = $(".message").first()[0].id
+          for (var i of Object.keys(data).reverse()){
+            
+          $(container).prepend(`<div class="d-flex mt-3" style="float: ${data[i].msg_type}; clear: both; margin: 5px; ">
+              ${data[i].msg_type=="left" ? 
+          '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
+    }
+
+            <div id=${data[i].user == "{{current_user.username}}" ? `${i}` : `${parseInt(i+1)}`} class="message ${data[i].msg_type}"><div class="float-end ms-2 change_btn"><i class="fa-angle-down ${data[i].msg_type} fas fa-1x" ></i></div> <span class="main-msg">
+${modify_str(data[i].msg)} </span><div style="font-size: 10px"><span class="float-end">${format_date(data[i].time)}</span></div>
+            </div>
+          </div>
+          `)
+        }
+        console.log(container.scrollTop)
+        resize_div()
+        console.log(first_elem)
+        if (!$.isEmptyObject(data)) document.getElementById(first_elem).scrollIntoView()
+          $(".loading").addClass("d-none")
+       } 
+
+    });
+              }
             if (container.scrollTop < container.scrollHeight - container.clientHeight) {
                 $(".scroll").fadeIn()
             } else {
@@ -433,6 +472,7 @@ function send(){
             dis("You have disconnected from the server. Reconnecting...")
         });
         socket.io.on("reconnect", () => {
+            socket.emit("get_data",{last_id:$(".message").last()[0].id,user:decodeURI(document.location.pathname.slice(6))})
             dis("You have successfully reconnected to server.")
           });
         socket.on("block",data=>{
@@ -488,7 +528,24 @@ function send(){
             $(".input-group").html(`<p class="w-100 mb-0  text-center">You can't send message anymore.<br>The user deleted their account.</p>`)
           }
         })
+        socket.on("rec_data",data=>{
+          
+           $("#status").text(status(data.status))
+          
+          
+          for (var i of Object.keys(data.message)){
+$("#container").append(`<div class="d-flex mt-3" style="float: ${data["message"][i].msg_type}; clear: both; margin: 5px; ">
+              ${data["message"][i].msg_type=="left" ? 
+          '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
+    }
 
+            <div id=${data["message"][i].user == "{{current_user.username}}" ? `${i}` : `${parseInt(i+1)}`} class="message ${data["message"][i].msg_type}"><div class="float-end ms-2 change_btn"><i class="fa-angle-down ${data["message"][i].msg_type} fas fa-1x" ></i></div> <span class="main-msg">
+${modify_str(data["message"][i].msg)} </span><div style="font-size: 10px"><span class="float-end">${format_date(data["message"][i].time)}</span></div>
+            </div>
+          </div>
+          `)
+}
+        })
     const arr = new Set()
         socket.on("msg", data => {
         
