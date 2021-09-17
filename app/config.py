@@ -10,8 +10,8 @@ class Config:
 			uri = uri.replace("postgres://", "postgresql://", 1)
 	except Exception as e:
 		print(e)
-	# SQLALCHEMY_DATABASE_URI = uri
-	SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"
+	SQLALCHEMY_DATABASE_URI = uri
+	# SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	DEBUG = True
 	MAIL_SERVER = "smtp.gmail.com"
