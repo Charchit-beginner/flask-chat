@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block headscript %}
-<script src="https://sdk.pushy.me/web/1.0.8/pushy-sdk.js"></script>
+<script src="https://sdk.pushy.me/web/1.0.8/pushy-sdk.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@latest/dist/browser-image-compression.js" defer></script>
     {% endblock %}
 {% block style %}
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
@@ -75,6 +76,10 @@
   {% if block %}
   <p class="w-100 mb-0  text-center ">You blocked the contact. <br>Unblock to send message.</p>
    {% elif user.status != "deleted" %}
+   <form id="upload-file" method="post" enctype="multipart/form-data">
+   <input type="file" name="file" class="d-none" id="file" onchange="previewFile()">
+ </form>
+   <button class="btn btn-dark" type="button" onclick="fileInput()"><i class="fa fa-upload" aria-hidden="true"></i></button>
   <input type="text" id="my_inp" class="form-control" placeholder="Type a message..." maxlength="1999" autocomplete="off">
   <button class="btn btn-dark" type="submit" id="send" onclick="send()"><i class="fab fa-telegram-plane"></i></button>
 {% else %}
@@ -88,6 +93,22 @@
   <ul id="contextMenu" class="dropdown-menu">
     
   </ul>
+   <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-modal="true" role="dialog" >
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+        
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      
+      <img src="" alt="" id="modalImage">
+    </div>
+  </div>
+</div>
+
+    </div>
+
+  <!-- <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="myModal" tabindex="-1">
+</div> -->
   <input type="text" id="copy_msg" style="position:fixed;top: -4000px;left:-4000px;">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     
@@ -97,6 +118,7 @@
 
 
     //custom functions to be called
+    const audio = new Audio("{{url_for('static',filename='audio/notification.mp3')}}")
     var timeout
     "{% if block%}"
     var block_type = "Unblock User"
@@ -175,10 +197,11 @@
         drop.style.top = pos.y + "px"
         if (e.target.id == ""){
           ids = $(e.target).parent().parent().attr("id")
-          
+          console.log($(e.target).parent().parent())
         }
         else{
         ids = e.target.id
+        console.log(e.target)
       }
       console.log(e)
       $(".copy").click(function(){
@@ -207,7 +230,7 @@
 
         $(".delme").click(function(){
           if (confirm("Do you really want to delete this?!")){
-
+            console.log(ids)
           socket.emit("change",{id:ids,type:"cur_d_me",user:"{{user.username}}",current_user:"{{current_user.username}}"})
         }
         })
@@ -293,17 +316,100 @@ function send(){
                 $("#my_inp").val("")
             }
           }
-          function status(data){
+function fileInput(){
+    $("input[type='file']").trigger('click');
+}
+
+function previewFile(event) {
+    var form_data = new FormData($('#upload-file')[0]);
+        $.ajax({
+            type: 'POST',
+            url: window.location.pathname,
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) {
+                console.log('Success!');
+            },
+        });
+        socket.emit("send_file")
+
+    }
+function status(data){
             if (data != "New User" && data != "Online" && data!= "Idle" && data!= "Editing Profile") return "Last Seen " +format_date(data)
             return data
-          }
 
+          }
+            $(".download_file").click(function (e) {
+                e.preventDefault();
+                  
+                window.location.href 
+                    = e.href;
+            });
+      function check_file_type(data,filetype){
+        console.log(filetype, filetype=="mp4")
+        if (filetype == 'mp4' || filetype == 'ogg' || filetype == 'mkv') {
+          console.log(filetype)
+        return `<video class="" src="${data}" height="200" width="200" controls/>`;
+      } else if (filetype == 'mp3' || filetype == 'wav' || filetype == 'aac') {
+        return `<audio class="" src="${data}" controls/>`;
+      }
+      else if(filetype == "js"){
+        return `<i class="fa fa-download cursor-pointer" role="button" aria-hidden="true">
+        <a href="${data}" class="download_file" download>fs</a>
+        </i>
+ - can't preview` 
+      } else {
+        return `<img class="img-thumbnail" src="${data}" height="200" width="200" role="button" onclick="showimg(this)"/>`;
+      }
+      }  
+      function update_file_dom(data,filetype){
+      
+      elem = check_file_type(data.msg,filetype)
+
+      let pos = data.user == "{{current_user.username}}" ? "left":"right"
+      
+
+
+      $(container).append(`<div class="d-flex mt-3" style="float: ${pos}; clear: both; margin: 5px; ">
+              ${pos=="left" ? 
+          '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
+    }
+            <div id=${data.user != "{{current_user.username}}" ? `${data.id}` : `${parseInt(data.id+1)}`} class="message ${pos}"><div class="float-end ms-2 change_btn"><i class="fa-angle-down ${pos} fas fa-1x" ></i></div> <span class="main-msg">${elem} </span><div style="font-size: 10px"><span class="float-end">${format_date(data.date)}</span></div>
+            </div>
+          </div>`)
+      container.scrollTop = container.scrollHeight - container.clientHeight;
+        $(".empty").remove()
+      }
+      function showimg(data){
+        var myModal = new bootstrap.Modal(document.getElementById('myModal'),{})
+        $("#modalImage").attr("src",data.src)
+        myModal.show()
+
+      }
+      function notify_user(){
+        const hasNumber = /\d/;
+        if (!hasNumber.test($("title")[0].innerText)){
+                  if (document.hidden){
+                $("title").text("(1) ChatApp")
+                audio.play()
+              }
+            }
+                else{
+                  if (document.hidden){
+                audio.play()
+                $("title").text(`(${parseInt($("title")[0].innerText.slice(1,2)) + 1}) ChatApp`)   
+              }
+            }
+      }
+      
 // document ready events
 
 
 
     $(document).ready(function() {
-        const audio = new Audio("{{url_for('static',filename='audio/notification.mp3')}}")
+        
         const muted = ('; '+document.cookie).split(`; muted=`).pop().split(';')[0];
         if (muted){
           audio.muted = true
@@ -311,7 +417,7 @@ function send(){
         else{
           audio.muted = false
         }
-        const hasNumber = /\d/;
+        
         var timeout
         var msg_count = 0
         let date = document.querySelector("#status")
@@ -332,6 +438,11 @@ function send(){
         });
         document.querySelectorAll(".main-msg").forEach(e => {
           e.innerHTML   = modify_str(e.innerText)
+          if (e.innerText.startsWith("https://firebasestorage.googleapis")){
+            filetype = e.innerText.split("?")[0].split(".")
+            e.innerHTML = check_file_type(e.innerText,filetype[filetype.length - 1])
+          }
+
         })
         btn.forEach(e => {
             e.onclick = menu
@@ -340,13 +451,15 @@ function send(){
         $(window).resize(function() {
             resize_div()
         });
+
         container.scrollTop = container.scrollHeight - container.clientHeight;
         $(container).scroll(function() {
           if (container.scrollTop == 0){
             $(".loading").removeClass("d-none")
+
                 $.ajax({
         type: "POST",
-        url: `${window.location.pathname}`,
+        url: window.location.pathname,
         data: {
           no:$(".message").length
         },
@@ -355,22 +468,24 @@ function send(){
           console.log(data)
 
         let first_elem = $(".message").first()[0].id
+        if ($(`#${Object.keys(data)[0]}`).length == 0){
           for (var i of Object.keys(data).reverse()){
-            
+            filetype = data[i].msg.split("?")[0].split(".")
           $(container).prepend(`<div class="d-flex mt-3" style="float: ${data[i].msg_type}; clear: both; margin: 5px; ">
               ${data[i].msg_type=="left" ? 
           '<img class="rounded-circle border pfp border-dark"  src="{{user.pic|get_img}}" width=25 height=25>' : ''
     }
 
             <div id=${data[i].user == "{{current_user.username}}" ? `${i}` : `${parseInt(i+1)}`} class="message ${data[i].msg_type}"><div class="float-end ms-2 change_btn"><i class="fa-angle-down ${data[i].msg_type} fas fa-1x" ></i></div> <span class="main-msg">
-${modify_str(data[i].msg)} </span><div style="font-size: 10px"><span class="float-end">${format_date(data[i].time)}</span></div>
+${data[i].msg.startsWith("https://firebasestorage.googleapis")? check_file_type(data[i].msg,filetype[filetype.length - 1]): modify_str(data[i].msg)} </span><div style="font-size: 10px"><span class="float-end">${format_date(data[i].time)}</span></div>
             </div>
           </div>
           `)
+           
         }
-        console.log(container.scrollTop)
+        
         resize_div()
-        console.log(first_elem)
+        }
         if (!$.isEmptyObject(data)) document.getElementById(first_elem).scrollIntoView()
           $(".loading").addClass("d-none")
        } 
@@ -561,18 +676,7 @@ ${modify_str(data["message"][i].msg)} </span><div style="font-size: 10px"><span 
                 }
             } else if (data.user == decodeURI(document.location.pathname.slice(6))) {
                 write(data.msg, "left", data.date,data.id,data.user)
-                if (!hasNumber.test($("title")[0].innerText)){
-                  if (document.hidden){
-                $("title").text("(1) ChatApp")
-                audio.play()
-              }
-            }
-                else{
-                  if (document.hidden){
-                audio.play()
-                $("title").text(`(${parseInt($("title")[0].innerText.slice(1,2)) + 1}) ChatApp`)   
-              }
-            }
+                notify_user()
             }
         })
         socket.on("error_msg", data =>{
@@ -603,6 +707,13 @@ ${modify_str(data["message"][i].msg)} </span><div style="font-size: 10px"><span 
     }
   }
 })
+
+      socket.on("file",data=>{
+        let filetype = data.msg.split("?")[0].split(".");
+        console.log(data)
+      update_file_dom(data,filetype[filetype.length - 1])
+      notify_user()
+      })
 
     });
    </script>

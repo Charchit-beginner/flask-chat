@@ -110,7 +110,7 @@ $(".edit_chat").click(function(){
 9. notification - done
 10. bring messages after scrolling - done
 22 - update page on reconnect  - done
-
+23. send files - done , only media now
 
 // later ideas 
 2. edit message

@@ -69,7 +69,7 @@
                         <div class="align-items-center d-flex hover py-2{% if user.username in blocked_users%} d-none blocked{% endif %}">
                             <img class="rounded-circle border border-dark" height="40" src="{{user.pic|get_img}}" width="40" style="aspect-ratio:16/9;">
                             
-                            <div class="ps-2" style="white-space: nowrap;">
+                            <div class="ps-2" style="white-space: nowrap; max-width:10px;">
                                 <span class="fw-bold text-dark fs-5 main-data">
                                   {% if user.status == "Online" %} 
                                         <i class="status fa fa-circle text-success " aria-hidden="true" ></i>
@@ -85,7 +85,7 @@
                                 </span>
                                 
                                 <br>
-                                    <span id="to_{{user.username}}" class="span fs-6 fw-lighter text-dark">
+                                    <span id="to_{{user.username}}" class="span fs-6 fw-lighter text-dark" >
                                         {% for i in msg %}
                                         {% if i.get_user == user.username %}{% if i.msg_type == "right" %}
                                         You: {{i.msg}}{% else %}{{i.msg}}{% endif %}

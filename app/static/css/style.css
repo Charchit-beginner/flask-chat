@@ -65,7 +65,12 @@
     z-index: 3;
     padding: 0px 6px;
 }
-
+.fa-download:hover{
+    color: grey;   
+}
+audio{
+    width:200px;
+}
 @media only screen and (max-width: 575px) {
     .input-group {
         margin-bottom: 0px!important;

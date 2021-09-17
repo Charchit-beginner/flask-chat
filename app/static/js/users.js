@@ -34,7 +34,7 @@ $(document).ready(function() {
     socket = io.connect(document.href);
     // last message shower
     socket.on("msg", data => {
-        console.log(data)
+        
         let unseen_msg_no = $(`a[href="/chat/${data.user}"]`).find("span.unseen")[0]
         let hasNumber = /\d/;
         if (data.rec_user == current_user.value) {
@@ -151,11 +151,13 @@ socket.on("editing_profile",data=>{
     socket.on("type", data => {
         spans = $(`a[href="/chat/${data.user}"]`).find("span.span")
         arr.add(spans.text())
+        console.log(arr)
         if (data.user != current_user.value) {
             if (data.typing == true) {
                 spans.html("<span style='color:green;font-weight:bold;'>Typing..<span>")
             } else {
-                var span_text = arr.values().next().value;
+                var span_text = spans[0].innerText == "Typing.." ?arr.values().next().value:Array.from(arr).pop()
+                console.log(arr,span_text)
                 spans.text(span_text)
             }
         }

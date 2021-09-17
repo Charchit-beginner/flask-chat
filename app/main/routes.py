@@ -10,6 +10,8 @@ import functools
 from flask_login import current_user
 from flask_socketio import disconnect
 from app.firebase import storage,firebase_user
+import secrets
+import os
 
 users = {}
 sids = {}
@@ -72,12 +74,26 @@ def get_data(data):
         emit("rec_data",{"message":a,"status":Detail.query.filter_by(username=data["user"]).first().status})
         
     
+
+def sendFile(data):
+    request.namespace = ""
+    request.sid = ""
+    print(data)
+    if not current_user.is_anonymous and not userDeleted(data["user"]):
+        block = Blocks.query.filter_by(user2=current_user.username).all()
+        print(block)
+        for i in list(sids):
+            if (sids[i] == data["user"] or sids[i] == current_user.username or ((sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i].endswith("user_contact"))) and sids[i] not in [i.user for  i in block]:
+                print(sids[i],print(i),"thisi is")
+                emit("file",data,room=i)
+
+
 @socketio.on('typing')
 @authenticated_only
 def typing(data):
     if not current_user.is_anonymous and not userDeleted(data["user"]):
         for i in list(sids):
-            if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
+            if sids[i] == data["user"] or sids[i] == current_user.username or ((sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i].endswith("user_contact")):
                 emit("type",{"typing":data["typing"],"user":current_user.username},room=i)
                     
 
@@ -95,10 +111,10 @@ def idle(data):
 
 @socketio.on('block')
 @authenticated_only
-def block(data):
+def block_user(data):
     if not  current_user.is_anonymous:
         for i in list(sids):
-            if   sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == current_user.username:
+            if   sids[i] == current_user.username or (sids[i].endswith("user_contact") and  sids[i][:len(sids[i]) - 12] == current_user.username):
                 emit("block",{"type":data["type"],"user":data["user"]},room=i)
         if data["type"] == "unblock":
             block = Blocks.query.filter_by(user=current_user.username,user2=data["user"]).first()
@@ -115,21 +131,41 @@ def block(data):
 def handle_change(data):
     if not current_user.is_anonymous:
         if current_user.username == data["current_user"]:
+            block = Blocks.query.filter_by(user2=current_user.username).all()
+            print(data)
             for i in list(sids):
-                if sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username:
+                if sids[i] == data["user"] or sids[i] == current_user.username or ((sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i].endswith("user_contact")) and sids[i] not in [i.user for  i in block] :
                     emit("change_ok",{"user":current_user.username,"id":data["id"],"type":data["type"]},room=i) 
 
             if data["type"] == "user_d":
                 msg = Message.query.filter_by(id=data["id"],msg_type="left",username=current_user.username,get_user=data["user"]).first()
+                try:
+                    if not Message.query.filter_by(id=int(data["id"])-1).first():
+                        storage.delete(msg.msg.split("?")[0].split("/")[-1],firebase_user["idToken"])
+                except Exception as e:
+                    print(e)
                 db.session.delete(msg)
             elif data["type"] == "cur_d_me":
                 msg = Message.query.filter_by(id=data["id"],msg_type="right",username=current_user.username,get_user=data["user"]).first()
+
                 print(msg)
+                try:
+                    if not Message.query.filter_by(id=int(data["id"])+1).first():
+                        storage.delete(msg.msg.split("?")[0].split("/")[-1],firebase_user["idToken"])
+                except Exception as e:
+                    print(e)
                 db.session.delete(msg)
             if data["type"] == "cur_d_all":
+                try:
+                    file_msg = Message.query.filter_by(id=data["id"],username=current_user.username).first()
+                    if file_msg.msg.startswith("https://firebasestorage.googleapis"):
+                        storage.delete(file_msg.msg.split("?")[0].split("/")[-1],firebase_user["idToken"])
+
+                except Exception as e:
+                    print(e)
                 msg1 = db.session.query(Message).filter(
                     and_(or_(Message.id==data["id"],Message.id==int(data["id"])+1),or_(Message.username == current_user.username,and_(Message.username == data["user"],Message.get_user == current_user.username,Message.msg_type == "left")))).delete()
-                
+
         db.session.commit()
         return "removed"
 
@@ -139,6 +175,13 @@ def handle_message(data):
     if not current_user.is_anonymous:
         if current_user.username == data["current_user"]:
             emit("deleted_all")
+            file_msg = Message.query.filter_by(username=current_user.username,get_user=data["user"]).all()
+            for i in file_msg:
+                if i.msg.startswith("https://firebasestorage.googleapis"):
+                    ID = i.id + 1 if i.msg_type == "right" else i.id -1 
+                    if not Message.query.filter_by(id=ID).first():
+                        storage.delete(i.msg.split("?")[0].split("/")[-1],firebase_user["idToken"])
+
             msgs = Message.query.filter_by(username=current_user.username,get_user=data["user"]).delete()
             db.session.commit()
 
@@ -146,6 +189,7 @@ def handle_message(data):
 @authenticated_only
 def handle_message(data):
     if not current_user.is_anonymous  and not userDeleted(data["user"]):
+        print(data)
         if data["user"] in [i.user2 for i in current_user.blocked_users]:
             return "You need to unblock to send messages to user!"
         if len(data["msg"]) < 2000:
@@ -158,12 +202,9 @@ def handle_message(data):
                 msg1 = Message(msg=data["msg"],msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
                 db.session.add(msg1)
             db.session.flush()
-            print(rec_user.status)
-            for i in block:
-                print(i.user,i.user2)
 
             for i in list(sids):
-                if (sids[i] == data["user"] or sids[i] == current_user.username or sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i] not in [i.user for  i in block]:
+                if (sids[i] == data["user"] or sids[i] == current_user.username or ((sids[i][:len(sids[i]) - 12] == data["user"] or sids[i][:len(sids[i]) - 12] == current_user.username) and sids[i].endswith("user_contact"))) and sids[i] not in [i.user for  i in block]:
                     print(sids[i],sids[i] not in [i.user for  i in block])
                     print(data,current_user.username)
                     user_stat = rec_user.status
@@ -179,10 +220,6 @@ def handle_message(data):
             return "Message sent!"
         else:
             emit("error_msg",{"error":"Limit of sending 2000 characters message exceeded"})
-
-
- # users = {charchit:sfsfs,charhit1:sefegr}
- # sid = {sfsfs:charchit,srfegsf:charchit,sefegr:charchit1}
 
 @main.app_template_filter('get_img')
 def get_img(img):
@@ -216,7 +253,31 @@ def chat(user):
         if not_id:
             current_user.notification_id = not_id
             db.session.commit()
-        else:
+
+        elif request.files.get('file'):
+            file = request.files['file']
+            random_hex = str(secrets.token_hex(15))
+            ext = os.path.splitext(file.filename)[1]
+            file_path = random_hex + current_user.username + "chat" +str(ext) 
+
+            file.save(file_path) # Save picture at picture path
+            storage.child(file_path).put(file_path) # Upload to firebase
+            os.remove(file_path)
+            fileUrl = storage.child(file_path).get_url(firebase_user["idToken"])
+
+            block = Blocks.query.filter_by(user2=current_user.username).all()
+            rec_user = Detail.query.filter_by(username=user).first()
+            msg = Message(msg=fileUrl,msg_type="right",get_user=user,owner=current_user,time=datetime.utcnow())
+            db.session.add(msg)
+            if user not in [i.user for  i in block]:
+                msg1 = Message(msg=fileUrl,msg_type="left",get_user=current_user.username,owner=rec_user,time=datetime.utcnow())        
+                db.session.add(msg1)
+            db.session.flush()
+            data = {"msg":fileUrl,"user":user,"current_user":current_user.username,"date":format_date(),"id":msg.id}
+            socketio.on_event('file_uploaded', sendFile(data))
+            db.session.commit()
+
+        elif request.form.get('no'):
             no = int(request.form.get('no'))
             msgs = Message.query.filter_by(username=current_user.username,get_user=User.username).order_by(Message.time).all()
             print(len(msgs))
@@ -242,5 +303,9 @@ def chat(user):
 def return_file():
     return Response("importScripts('https://sdk.pushy.me/web/1.0.8/pushy-service-worker.js');", mimetype='  text/javascript')
 
+
+    
+    
+    
 
 
