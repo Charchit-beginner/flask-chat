@@ -8,6 +8,7 @@
 - Flask (virtual environment or globally)
 - Install all the requirements using `pip install -r requirements.txt`
 - Firebase account
+- Pushy account
 ### Run the app
 #### 1. configure the env file (explained below).
 #### 2. Comment the line `SQLALCHEMY_DATABASE_URI = uri` and uncomment `SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"` in config.py
