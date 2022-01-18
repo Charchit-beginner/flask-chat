@@ -46,6 +46,7 @@ MEASUREMENT_ID="Ms_id"
   - other third party modules like wtforms, flask-Migrate, flask_login
 - Used Sqlite (for development) and postgresql (for production)
 - HTML, CSS, JS, JQUERY, bootstrap
+- PushySdk for push notification
 
 # Features
 - Full authentication system 
@@ -60,6 +61,7 @@ MEASUREMENT_ID="Ms_id"
 - User Status - (like idle, online, offline, typing)
 - Shows number of unseen message on the users page
 - Notification tune on recieving message
+- Push Notification facility for one device
 
 ### Note - The app is still under development. So you may see some bugs. Please contact me when you come across any.
 
